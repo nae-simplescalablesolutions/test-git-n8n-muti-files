@@ -1,0 +1,1789 @@
+{
+  "createdAt": "2025-03-13T05:13:43.465Z",
+  "updatedAt": "2025-04-09T06:08:54.340Z",
+  "id": "YiEQR4M7JfHUbF2f",
+  "name": "Line to GHL",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": ":locationId",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "70d3cb52-6d0b-477e-a51c-a70bce4b4b68",
+      "name": "Webhook from Line",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -3920,
+        -580
+      ],
+      "webhookId": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e28dc54-2c67-41cd-8078-2f027824e175",
+              "name": "companyId",
+              "value": "PZFL9vwSqYneadvzwWh9",
+              "type": "string"
+            },
+            {
+              "id": "9ed7fd96-a881-4282-957d-ef33a9f64b40",
+              "name": "locationId",
+              "value": "={{ $json.locationId }}",
+              "type": "string"
+            },
+            {
+              "id": "28513789-db76-4631-b8ed-c321557fa5d7",
+              "name": "conversationProviderId",
+              "value": "67d26c1612c9a31b27d87a6c",
+              "type": "string"
+            },
+            {
+              "id": "0e2443ee-cfb5-4276-bc53-4f06f8ad2255",
+              "name": "webhookSource",
+              "value": "={{ $json.webhookSource }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2260,
+        -260
+      ],
+      "id": "096ed10a-a094-4a47-9ccb-bd6dc47075a1",
+      "name": "Set fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').item.json.locationId }}\",\n  \"firstName\": \"{{$('Line userProfile').item.json.displayName}}\",\n  \"lastName\": \"\",\n  \"phone\": \"\",\n  \"customFields\": [\n    {\"id\": \"KGsAdhDPwVJp1HUmpLbx\", \"field_value\": \"{{$('Line userProfile').item.json.userId}}\"}\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        -720
+      ],
+      "id": "99802e9f-6b35-4981-b132-3d34dffc4218",
+      "name": "GHL createContact",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "0E0ztc816pcxZuBL",
+          "name": "GHL Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "contacts",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Line userProfile').item.json.displayName }}"
+            },
+            {
+              "fieldId": "location_id",
+              "fieldValue": "={{ $('GHL createContact').item.json.contact.locationId }}"
+            },
+            {
+              "fieldId": "contact_id",
+              "fieldValue": "={{ $('GHL createContact').item.json.contact.id }}"
+            },
+            {
+              "fieldId": "line_id",
+              "fieldValue": "={{ $('Line userProfile').item.json.userId }}"
+            },
+            {
+              "fieldId": "conversation_id",
+              "fieldValue": "={{ $('GHL createConversation').item.json.conversation.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -720
+      ],
+      "id": "0b27861b-65e0-4156-b160-7232828a24ef",
+      "name": "Supabase createContact",
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/oauth/locationToken",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "highLevelOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "companyId",
+              "value": "={{ $('Set fields').item.json.companyId }}"
+            },
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').item.json.locationId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b7c0d364-eb70-499f-ae91-cca1cba01724",
+      "name": "GHL locationAccessToken",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1700,
+        -720
+      ],
+      "credentials": {
+        "highLevelOAuth2Api": {
+          "id": "3i0hdWVYkYVpJ4U5",
+          "name": "HighLevel account message api"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.line.me/v2/bot/profile/{{ $json.source.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        -740
+      ],
+      "id": "2e0a7af3-1788-4d5e-bb0f-014548148f27",
+      "name": "Line userProfile",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        },
+        "httpCustomAuth": {
+          "id": "CPhIZ3E01ZR9HLg0",
+          "name": "Line messaging Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages/inbound",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"WebChat\",\n  \"message\": \"{{ $('Edit Fields').item.json.message.text }}\",\n  \"conversationId\": \"{{ $('Supabase getContactId').item.json.conversation_id }}\",\n  \"conversationProviderId\": \"67d26c1612c9a31b27d87a6c\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        -1180
+      ],
+      "id": "ae4890f3-df18-4fed-a670-3b308a522563",
+      "name": "GHL messageToGHL",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        },
+        "httpCustomAuth": {
+          "id": "0E0ztc816pcxZuBL",
+          "name": "GHL Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "locationId",
+              "value": "={{ $('GHL createContact').item.json.contact.locationId }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('GHL createContact').item.json.contact.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        -720
+      ],
+      "id": "847aa338-0cb7-4adb-b71a-ddd12a12f849",
+      "name": "GHL createConversation",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "0E0ztc816pcxZuBL",
+          "name": "GHL Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eb037de0-7231-45b1-8518-d6e7fac90fbf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -4060,
+        20
+      ],
+      "id": "1f11d2a3-b056-47f2-a833-04734b055522",
+      "name": "Webhook From GHL",
+      "webhookId": "eb037de0-7231-45b1-8518-d6e7fac90fbf"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set fields').item.json.webhookSource }}",
+                    "rightValue": "line",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a2a916f8-3b7a-4a57-ae93-17b2c0d494c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Line"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c4cfb3ac-5b88-4f9c-83d1-28765580b212",
+                    "leftValue": "={{ $('Set fields').item.json.webhookSource }}",
+                    "rightValue": "highlevel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "GHL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1980,
+        -260
+      ],
+      "id": "7a14de3d-1a48-49bc-8b8b-492ddcd388ae",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95e68d41-053d-40f9-880f-1971f2e7d9e6",
+              "name": "webhookSource",
+              "value": "line",
+              "type": "string"
+            },
+            {
+              "id": "92be1a38-1d0b-4da0-af33-53e2e098b3d0",
+              "name": "locationId",
+              "value": "={{ $('Webhook from Line').item.json.params.locationId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2800,
+        -600
+      ],
+      "id": "30a45bdf-30b2-402b-ba1a-300fd69d7cec",
+      "name": "setSourceLine"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f739ebf2-3738-4325-a627-f592e4cd0533",
+              "name": "webhookSource",
+              "value": "highlevel",
+              "type": "string"
+            },
+            {
+              "id": "4fe11887-366a-4473-939c-634c1927021c",
+              "name": "locationId",
+              "value": "={{ $('Webhook From GHL').item.json.body.locationId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2780,
+        0
+      ],
+      "id": "a0adcaf9-513b-4b62-b80f-01a62b09a042",
+      "name": "setSourceGHL"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "053b92b1-c2b8-40b1-a1bc-5b88d57dd8ab",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        -740
+      ],
+      "id": "ad9566d6-f4cb-4176-b590-92fe9f6c24cc",
+      "name": "contactId Exist?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        560
+      ],
+      "id": "4d3a76ab-e342-43ea-9ec7-8cbb91ce9569",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7fff3de7-e586-4ad7-97c0-b6906570234f",
+              "leftValue": "={{ $('Webhook From GHL').item.json.body.conversationProviderId }}",
+              "rightValue": "={{ $('Webhook From GHL').item.json.body.conversationProviderId }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f827d3d2-5efb-4b4a-8d7e-02d535dc4e8f",
+              "leftValue": "={{ $('Webhook From GHL').item.json.body.type }}",
+              "rightValue": "SMS",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1540,
+        300
+      ],
+      "id": "fe374ef8-091a-40fa-b331-09e3fdc77b56",
+      "name": "is Outbound?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "053b92b1-c2b8-40b1-a1bc-5b88d57dd8ab",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1020,
+        60
+      ],
+      "id": "bbe7e65d-34ee-4064-bd6f-45d2e608fb78",
+      "name": "contact Exist?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $('Supabase getContact').item.json.line_id }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "dccd31e4-fbfd-4584-9ca5-503720018e94",
+      "name": "Line : Message Loading",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -740,
+        40
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        },
+        "httpCustomAuth": {
+          "id": "CPhIZ3E01ZR9HLg0",
+          "name": "Line messaging Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "contacts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $('Webhook From GHL').item.json.body.conversationId }}"
+            },
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('Webhook From GHL').item.json.body.contactId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1260,
+        60
+      ],
+      "id": "ca648d62-a51d-4413-bfd9-1d83e40eb3e8",
+      "name": "Supabase getContact",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "contacts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "line_id",
+              "keyValue": "={{ $('Line userProfile').item.json.userId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -740
+      ],
+      "id": "844d804f-278f-4ff9-abad-15ab23fa1318",
+      "name": "Supabase getContactId",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $('Supabase getContact').item.json.line_id }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $('Webhook From GHL').item.json.body.message }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -280,
+        40
+      ],
+      "id": "5a9bb320-36bf-4d1d-94af-00cac2fca1b1",
+      "name": "Line Push",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "CPhIZ3E01ZR9HLg0",
+          "name": "Line messaging Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "line_messeging_credential",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "location_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Supabase getAccessToken').item.json.locationId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "access_token",
+              "fieldValue": "={{ $json.access_token }}"
+            },
+            {
+              "fieldId": "token_expire",
+              "fieldValue": "={{ $json.expires_in }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ DateTime.now() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1180,
+        -1160
+      ],
+      "id": "bdb14547-8e1b-4dc1-a129-bd2ac35063ed",
+      "name": "Supabase Update accessToken",
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/accessToken",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "={{ $('Supabase getAccessToken').item.json.channel_id }}"
+            },
+            {
+              "name": "client_secret",
+              "value": "={{ $('Supabase getAccessToken').item.json.channel_secret }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1480,
+        -1160
+      ],
+      "id": "f5f5633c-2def-4dfc-8887-5e868b6cd380",
+      "name": "Get accessToken"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/verify",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1140,
+        -720
+      ],
+      "id": "57dfb642-39d8-485d-83eb-ac6768fe1a78",
+      "name": "Verify accessToken",
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "line_messeging_credential",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "location_id",
+              "keyValue": "={{ $('Set fields').item.json.locationId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1400,
+        -720
+      ],
+      "id": "b6a56f0c-f2c6-4d98-8fad-25f502ecfd2d",
+      "name": "Supabase getAccessToken",
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        300
+      ],
+      "id": "253af0e3-6841-4d33-a3d4-ce6297f645aa",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{ JSON.stringify($json.body) }}",
+        "dataPropertyName": "signature",
+        "secret": "=",
+        "encoding": "base64"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -3720,
+        -580
+      ],
+      "id": "885dbdc0-9efc-4010-bccc-6dcbc32a6dcf",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Unauthorized!\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -3140,
+        380
+      ],
+      "id": "ce3f4db6-2d96-4374-9809-79af963627e9",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "from cryptography.hazmat.primitives.asymmetric import padding\nfrom cryptography.hazmat.primitives import hashes\nfrom cryptography.hazmat.primitives import serialization\nfrom cryptography.hazmat.primitives.serialization import load_pem_public_key\nimport base64\n\ndef verify_signature(public_key_pem: str, signature: str, payload: dict) -> bool:\n    try:\n        public_key_pem_string = \"\\n\".join(line.strip() for line in public_key_pem.splitlines())\n        public_key_bytes = public_key_pem_string.encode('utf-8')\n        public_key = serialization.load_pem_public_key(public_key_bytes)\n\n        payload_bytes = payload.encode()\n\n        signature_bytes = base64.b64decode(signature)\n\n        public_key.verify(\n            signature_bytes,\n            payload_bytes,\n            padding.PKCS1v15(),\n            hashes.SHA256()\n        )\n        return True\n    except Exception as e:\n        return False\n\ninput_data = _input.item.json\n\npublic_key = input_data.publicKey\n\nif not input_data.headers.get(\"x-wh-signature\", False):\n  return {\"valid\": True}\n\nsignature = input_data.headers[\"x-wh-signature\"]\npayload = input_data.webhookBody\n\n# Perform verification\nis_valid = verify_signature(public_key, signature, payload)\n\nreturn {\"valid\": is_valid}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3700,
+        20
+      ],
+      "id": "d2c63f45-ad2b-43bf-82d8-727e891cf71b",
+      "name": "verify_signature"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e6c4a701-132d-4172-9f0b-a83b85510898",
+              "name": "publicKey",
+              "value": "=-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAokvo/r9tVgcfZ5DysOSC Frm602qYV0MaAiNnX9O8KxMbiyRKWeL9JpCpVpt4XHIcBOK4u3cLSqJGOLaPuXw6 dO0t6Q/ZVdAV5Phz+ZtzPL16iCGeK9po6D6JHBpbi989mmzMryUnQJezlYJ3DVfB csedpinheNnyYeFXolrJvcsjDtfAeRx5ByHQmTnSdFUzuAnC9/GepgLT9SM4nCpv uxmZMxrJt5Rw+VUaQ9B8JSvbMPpez4peKaJPZHBbU3OdeCVx5klVXXZQGNHOs8gF 3kvoV5rTnXV0IknLBXlcKKAQLZcY/Q9rG6Ifi9c+5vqlvHPCUJFT5XUGG5RKgOKU J062fRtN+rLYZUV+BjafxQauvC8wSWeYja63VSUruvmNj8xkx2zE/Juc+yjLjTXp IocmaiFeAO6fUtNjDeFVkhf5LNb59vECyrHD2SQIrhgXpO4Q3dVNA5rw576PwTzN h/AMfHKIjE4xQA1SZuYJmNnmVZLIZBlQAF9Ntd03rfadZ+yDiOXCCs9FkHibELhC HULgCsnuDJHcrGNd5/Ddm5hxGQ0ASitgHeMZ0kcIOwKDOzOU53lDza6/Y09T7sYJ PQe7z0cvj7aE4B+Ax1ZoZGPzpJlZtGXCsu9aTEGEnKzmsFqwcSsnw3JB31IGKAyk T1hhTiaCeIY/OwwwNUY2yvcCAwEAAQ== \n-----END PUBLIC KEY-----",
+              "type": "string"
+            },
+            {
+              "id": "6dc4d43e-6f49-4006-b569-3657c5444754",
+              "name": "webhookBody",
+              "value": "={{ JSON.stringify($json.body) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3880,
+        20
+      ],
+      "id": "777b8959-e458-48bb-ae59-e707740fea65",
+      "name": "Set publicKey"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9e4fd51-566b-409d-b982-0e95a872740b",
+              "leftValue": "={{ $json.headers[\"x-line-signature\"] }}",
+              "rightValue": "={{ $json.signature }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3540,
+        -580
+      ],
+      "id": "0ef75f31-a1e0-4ad5-af23-1ca0ac238bfe",
+      "name": "Line validSignature?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9e4fd51-566b-409d-b982-0e95a872740b",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "={{ $json.signature }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3520,
+        20
+      ],
+      "id": "b6bb6ffa-a310-4051-a486-ba80e80cfcdc",
+      "name": "GHL validSignature?"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -3140,
+        -760
+      ],
+      "id": "8d236f9c-0582-4b19-b5a3-336d60f0b17e",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a6eeefa9-c909-49ba-bfad-81c094ad7d8f",
+              "leftValue": "={{ $('Webhook From GHL').item.json.query.type }}",
+              "rightValue": "=updateLineChannel",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3140,
+        20
+      ],
+      "id": "f06305d6-485d-4662-b4d3-a6e510f5e009",
+      "name": "If",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "line_messeging_credential",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "location_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.locationId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "access_token",
+              "fieldValue": "={{ $('Webhook From GHL').item.json.body.customData.channel_id }}"
+            },
+            {
+              "fieldId": "token_expire",
+              "fieldValue": "={{ $('Webhook From GHL').item.json.body.customData.channel_secret }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ DateTime.now() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2140,
+        440
+      ],
+      "id": "8b041c54-ef00-4250-a045-8eb36fa8dee7",
+      "name": "Supabase Update lineChannel",
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/accessToken",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "={{ $('Webhook From GHL').item.json.body.customData.channel_id }}"
+            },
+            {
+              "name": "client_secret",
+              "value": "={{ $('Webhook From GHL').item.json.body.customData.channel_secret }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2780,
+        240
+      ],
+      "id": "66eeb393-3ee7-41f5-aebf-541366abf2de",
+      "name": "Get accessToken1"
+    },
+    {
+      "parameters": {
+        "tableId": "line_messeging_credential",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "access_token",
+              "fieldValue": "={{ $json.access_token }}"
+            },
+            {
+              "fieldId": "token_expire",
+              "fieldValue": "={{ $json.expires_in }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ DateTime.now() }}"
+            },
+            {
+              "fieldId": "location_id",
+              "fieldValue": "={{ $('Webhook From GHL').item.json.body.customData.locationId }}"
+            },
+            {
+              "fieldId": "company_id",
+              "fieldValue": "PZFL9vwSqYneadvzwWh9"
+            },
+            {
+              "fieldId": "channel_id",
+              "fieldValue": "={{ $('Webhook From GHL').item.json.body.customData.channel_id }}"
+            },
+            {
+              "fieldId": "channel_secret",
+              "fieldValue": "={{ $('Webhook From GHL').item.json.body.customData.channel_secret }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2520,
+        240
+      ],
+      "id": "e6492f18-8d0c-46fe-8fe5-4d863e8eac97",
+      "name": "Supabase Create lineChannel",
+      "retryOnFail": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "NxjBfHpBiSu45fbA",
+          "name": "Supabase scalify-line-dev-nae"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Webhook from Line').item.json.body.events;\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -780,
+        -740
+      ],
+      "id": "026a1644-45c9-4f9e-8998-81a8b26dd6f5",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -120,
+        -740
+      ],
+      "id": "4a571c33-7ca9-4560-9149-29ec6900fe9c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -400,
+        -740
+      ],
+      "id": "b274ef76-3fff-4dac-8ff7-9653570f157f",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "Webhook from Line": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GHL createContact": {
+      "main": [
+        [
+          {
+            "node": "GHL createConversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GHL locationAccessToken": {
+      "main": [
+        [
+          {
+            "node": "Supabase getAccessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line userProfile": {
+      "main": [
+        [
+          {
+            "node": "Supabase getContactId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GHL createConversation": {
+      "main": [
+        [
+          {
+            "node": "Supabase createContact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase createContact": {
+      "main": [
+        [
+          {
+            "node": "Supabase getContactId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook From GHL": {
+      "main": [
+        [
+          {
+            "node": "Set publicKey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setSourceLine": {
+      "main": [
+        [
+          {
+            "node": "Set fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setSourceGHL": {
+      "main": [
+        [
+          {
+            "node": "Set fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "GHL locationAccessToken",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "is Outbound?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contactId Exist?": {
+      "main": [
+        [
+          {
+            "node": "GHL messageToGHL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GHL createContact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is Outbound?": {
+      "main": [
+        [
+          {
+            "node": "Supabase getContact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contact Exist?": {
+      "main": [
+        [
+          {
+            "node": "Line : Message Loading",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading": {
+      "main": [
+        [
+          {
+            "node": "Line Push",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase getContact": {
+      "main": [
+        [
+          {
+            "node": "contact Exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase getContactId": {
+      "main": [
+        [
+          {
+            "node": "contactId Exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Push": {
+      "main": [
+        []
+      ]
+    },
+    "Supabase Update accessToken": {
+      "main": [
+        [
+          {
+            "node": "Supabase getAccessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get accessToken": {
+      "main": [
+        [
+          {
+            "node": "Supabase Update accessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify accessToken": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get accessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase getAccessToken": {
+      "main": [
+        [
+          {
+            "node": "Verify accessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Line validSignature?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set publicKey": {
+      "main": [
+        [
+          {
+            "node": "verify_signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verify_signature": {
+      "main": [
+        [
+          {
+            "node": "GHL validSignature?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line validSignature?": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "setSourceLine",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GHL validSignature?": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "setSourceGHL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get accessToken1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get accessToken1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Create lineChannel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Create lineChannel": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Supabase Update lineChannel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GHL messageToGHL": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Line userProfile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook from Line": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-scalify-u18380.vm.elestio.app",
+            "x-real-ip": "147.92.149.169",
+            "x-forwarded-for": "147.92.149.169",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "443",
+            "connection": "close",
+            "content-length": "560",
+            "x-line-signature": "CjmcIxhv7KZFxYgYgt2d6IeQfbOsSjgqxBsPYAHJZG4=",
+            "content-type": "application/json; charset=utf-8",
+            "user-agent": "LineBotWebhook/2.0"
+          },
+          "params": {
+            "locationId": "BdbyH4PWaqOMU5FUcrZa"
+          },
+          "query": {},
+          "body": {
+            "destination": "Uc8088b48180c74f909d55e446ea57770",
+            "events": [
+              {
+                "type": "message",
+                "message": {
+                  "type": "text",
+                  "id": "553739836691841595",
+                  "quoteToken": "e7-56H2N0VtbZxC-_IjH8mR_P-aZyTnqYtiX3FsMcjPtsmNcCU-847CWsYlLlzmoiscv4ekyiKPAx3wnug7y0Uin7ZRnYWCWTiWimzmpxDWWPGxj8PxWga83EusvMGN_qQ2SrLZ3ZyB5br3TaRBnbw",
+                  "text": "test"
+                },
+                "webhookEventId": "01JQ61JNED4NPXJ7DNVP7D2Z48",
+                "deliveryContext": {
+                  "isRedelivery": false
+                },
+                "timestamp": 1742885966802,
+                "source": {
+                  "type": "user",
+                  "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
+                },
+                "replyToken": "ace9bba7428f427eb4b0941ca90d8dfe",
+                "mode": "active"
+              }
+            ]
+          },
+          "webhookUrl": "https://n8n-scalify-u18380.vm.elestio.app/webhook/638c118e-1c98-4491-b6ff-14e2e75380b6/:locationId",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Code": [
+      {
+        "json": {
+          "type": "message",
+          "message": {
+            "type": "text",
+            "id": "553739836691841595",
+            "quoteToken": "e7-56H2N0VtbZxC-_IjH8mR_P-aZyTnqYtiX3FsMcjPtsmNcCU-847CWsYlLlzmoiscv4ekyiKPAx3wnug7y0Uin7ZRnYWCWTiWimzmpxDWWPGxj8PxWga83EusvMGN_qQ2SrLZ3ZyB5br3TaRBnbw",
+            "text": "test11"
+          },
+          "webhookEventId": "01JQ61JNED4NPXJ7DNVP7D2Z48",
+          "deliveryContext": {
+            "isRedelivery": false
+          },
+          "timestamp": 1742885966802,
+          "source": {
+            "type": "user",
+            "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
+          },
+          "replyToken": "ace9bba7428f427eb4b0941ca90d8dfe",
+          "mode": "active"
+        }
+      },
+      {
+        "json": {
+          "type": "message",
+          "message": {
+            "type": "text",
+            "id": "553739836691841595",
+            "quoteToken": "e7-56H2N0VtbZxC-_IjH8mR_P-aZyTnqYtiX3FsMcjPtsmNcCU-847CWsYlLlzmoiscv4ekyiKPAx3wnug7y0Uin7ZRnYWCWTiWimzmpxDWWPGxj8PxWga83EusvMGN_qQ2SrLZ3ZyB5br3TaRBnbw",
+            "text": "test12"
+          },
+          "webhookEventId": "01JQ61JNED4NPXJ7DNVP7D2Z48",
+          "deliveryContext": {
+            "isRedelivery": false
+          },
+          "timestamp": 1742885966802,
+          "source": {
+            "type": "user",
+            "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
+          },
+          "replyToken": "ace9bba7428f427eb4b0941ca90d8dfe",
+          "mode": "active"
+        }
+      },
+      {
+        "json": {
+          "type": "message",
+          "message": {
+            "type": "text",
+            "id": "553739836691841595",
+            "quoteToken": "e7-56H2N0VtbZxC-_IjH8mR_P-aZyTnqYtiX3FsMcjPtsmNcCU-847CWsYlLlzmoiscv4ekyiKPAx3wnug7y0Uin7ZRnYWCWTiWimzmpxDWWPGxj8PxWga83EusvMGN_qQ2SrLZ3ZyB5br3TaRBnbw",
+            "text": "test13"
+          },
+          "webhookEventId": "01JQ61JNED4NPXJ7DNVP7D2Z48",
+          "deliveryContext": {
+            "isRedelivery": false
+          },
+          "timestamp": 1742885966802,
+          "source": {
+            "type": "user",
+            "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
+          },
+          "replyToken": "ace9bba7428f427eb4b0941ca90d8dfe",
+          "mode": "active"
+        }
+      },
+      {
+        "json": {
+          "type": "message",
+          "message": {
+            "type": "text",
+            "id": "553739836691841595",
+            "quoteToken": "e7-56H2N0VtbZxC-_IjH8mR_P-aZyTnqYtiX3FsMcjPtsmNcCU-847CWsYlLlzmoiscv4ekyiKPAx3wnug7y0Uin7ZRnYWCWTiWimzmpxDWWPGxj8PxWga83EusvMGN_qQ2SrLZ3ZyB5br3TaRBnbw",
+            "text": "test14"
+          },
+          "webhookEventId": "01JQ61JNED4NPXJ7DNVP7D2Z48",
+          "deliveryContext": {
+            "isRedelivery": false
+          },
+          "timestamp": 1742885966802,
+          "source": {
+            "type": "user",
+            "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
+          },
+          "replyToken": "ace9bba7428f427eb4b0941ca90d8dfe",
+          "mode": "active"
+        }
+      }
+    ]
+  },
+  "versionId": "f0d3db42-f8ea-4ae5-82fc-00f5a9d0adaf",
+  "triggerCount": 2,
+  "tags": []
+}
