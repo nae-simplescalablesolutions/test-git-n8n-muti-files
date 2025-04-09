@@ -1,0 +1,906 @@
+{
+  "createdAt": "2025-04-08T04:10:57.590Z",
+  "updatedAt": "2025-04-09T07:30:31.230Z",
+  "id": "UYwzwU1rSc2OjOFz",
+  "name": "Line Set Webhook Endpoint",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e28dc54-2c67-41cd-8078-2f027824e175",
+              "name": "companyId",
+              "value": "PZFL9vwSqYneadvzwWh9",
+              "type": "string"
+            },
+            {
+              "id": "28513789-db76-4631-b8ed-c321557fa5d7",
+              "name": "appId",
+              "value": "67eaa7b26ee57dcf1bb8423e",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2540,
+        420
+      ],
+      "id": "fed7700d-26a6-4bae-a66d-63ea51fa42ae",
+      "name": "Set fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/oauth/locationToken",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "highLevelOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "companyId",
+              "value": "={{ $('Set fields').item.json.companyId }}"
+            },
+            {
+              "name": "locationId",
+              "value": "={{ $json.locations[1]._id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "201799a8-4c6b-47a5-bde8-1e4110e9e0b4",
+      "name": "Scalify Location Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1460,
+        440
+      ],
+      "credentials": {
+        "highLevelOAuth2Api": {
+          "id": "JNMcHEe5dnI4P2Xz",
+          "name": "Scalify Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/accessToken",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "={{ $('Line Custom Fields Data').first().json[\"Line Channel ID\"].value }}"
+            },
+            {
+              "name": "client_secret",
+              "value": "={{ $('Line Custom Fields Data').first().json[\"Line Channel Secret\"].value }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        120
+      ],
+      "id": "b91d423e-a6c5-4fc8-9070-0f1943b98cc8",
+      "name": "Line Access Token - 2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/verify",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $json.line_access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        420
+      ],
+      "id": "11b91b38-0f95-4799-a6e0-12a3b1366394",
+      "name": "Line Verify Access Token",
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/locations/{{$json.locationId}}/customFields",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "contact"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1140,
+        200
+      ],
+      "id": "b789ce2d-a4ff-44db-88e4-1d9f4495b80d",
+      "name": "Scalify Get Custom Fields",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/locations/{{$json.locationId}}/customValues",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1140,
+        640
+      ],
+      "id": "49b59d4d-63aa-426d-9712-28c515417baa",
+      "name": "Scalify Get Custom Values",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -480,
+        420
+      ],
+      "id": "ab0f880c-89e7-471d-921c-bda7674df11d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7aa8577d-a789-4b6d-b6a8-f252812e9862",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "{{ custom_values.line_channel_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "291d9eeb-e472-47ed-958e-3227137c46d3",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "{{ custom_values.line_channel_secret }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "3cb44d9c-1578-4b11-bf48-5d558c905415",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "{{ custom_values.line_access_token }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -740,
+        640
+      ],
+      "id": "31d60b58-c56a-41ff-8f61-1ccbdfcdd380",
+      "name": "Filter Line Credentials"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst lineData = {}\n\nfor (const item of $input.all()) {\n  lineData[item.json?.name] = {\n    \"id\" : item.json?.id,\n    \"locationId\" : item.json?.locationId,\n    \"value\" : item.json?.value,\n    \"name\" : item.json?.name\n  }\n}\n\nreturn lineData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        420
+      ],
+      "id": "650228f4-afc3-4001-9401-abefe6d7d5dd",
+      "name": "Line Custom Fields Data"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/locations/{{ $('Set fields').first().json.locationId }}/customValues/{{ $('Line Custom Fields Data').first().json[\"Line Access Token\"].id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "=Line Access Token"
+            },
+            {
+              "name": "value",
+              "value": "={{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        120
+      ],
+      "id": "24cf9b1b-5232-4760-8376-9a70f72d7e96",
+      "name": "Scalify Update Line Access Token",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0418af2c-14b6-4e5f-8543-ff61dd17a03f",
+              "name": "line_access_token",
+              "value": "={{ $json[\"Line Access Token\"].value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        420
+      ],
+      "id": "c9d21b5b-2e0c-47d7-8cc1-ae7f3b83b173",
+      "name": "Set Line Access Token - 1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "452d187c-c7d8-4c13-b4ad-d466ff42fce4",
+              "name": "Line Access Token",
+              "value": "={\n  \"value\" : \"{{ $json.customValue.value }}\"\n}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        120
+      ],
+      "id": "a754fcb3-589e-40a5-903d-ce8c05cdfa79",
+      "name": "Set Line Access Token - 2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7aa8577d-a789-4b6d-b6a8-f252812e9862",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.line_id",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c7a6c11f-c0dc-4aa7-8ebc-29f26e7f42a6",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.line_status",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e29c3d9f-353b-478c-b9e8-7664c6f1425e",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.line_source_type",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "8f01fecd-d5a2-49d8-88bc-b1756cb1b46d",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.language",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -740,
+        200
+      ],
+      "id": "a5c0a2da-4312-4e71-8024-5a0d32b8f152",
+      "name": "Filter Line Custom Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "customFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        200
+      ],
+      "id": "a62b0f25-027c-414c-80eb-482180b1c90c",
+      "name": "Split Custom Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "customValues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        640
+      ],
+      "id": "8e49597b-3aab-4b5a-b271-e13596add264",
+      "name": "Split Custom Values"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://api.line.me/v2/bot/channel/webhook/endpoint",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "endpoint",
+              "value": "=https://n8n-scalify-u18380.vm.elestio.app/webhook/638c118e-1c98-4491-b6ff-14e2e75380b6/{{$('Get Install Locations').first().json.locations[1]._id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        1120
+      ],
+      "id": "422837a9-6ecd-4133-b2bb-dc0612f13ab5",
+      "name": "Line Put Webhook Endpoint",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.line.me/v2/bot/channel/webhook/endpoint",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        1080
+      ],
+      "id": "846f7dd0-839b-49d3-934a-5301867c8aa3",
+      "name": "Line Get Webhook Endpoint",
+      "retryOnFail": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2780,
+        420
+      ],
+      "id": "fdba505a-429e-480c-af11-0da526aef9c5",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1780,
+        420
+      ],
+      "id": "28c77c71-06c3-407e-a9f9-af3a45d5803d",
+      "name": "Loop Over Items",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "locations",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        420
+      ],
+      "id": "198856b4-89cc-417e-b3a8-eff840a1d341",
+      "name": "Split Out",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "04f241f7-871d-4935-b7ae-fa8faefc843e",
+              "leftValue": "={{ $json.endpoint }}",
+              "rightValue": "=https://n8n-scalify-u18380.vm.elestio.app/webhook/638c118e-1c98-4491-b6ff-14e2e75380b6/{{ $('Get Install Locations').first().json.locations[1]._id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1500,
+        920
+      ],
+      "id": "9ff0326b-8648-481a-b8b9-d451461ff3e7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "https://services.leadconnectorhq.com/oauth/installedLocations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "highLevelOAuth2Api",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={\n  \"isInstalled\": true,\n  \"appId\": \"{{ $json.appId }}\",\n  \"companyId\": \"{{ $json.companyId }}\"\n}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Version\": \"2021-07-28\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2300,
+        420
+      ],
+      "id": "5d04a512-71fe-4fe4-80b7-1c32f33c3977",
+      "name": "Get Install Locations",
+      "credentials": {
+        "highLevelOAuth2Api": {
+          "id": "JNMcHEe5dnI4P2Xz",
+          "name": "Scalify Line Messaging"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Set fields": {
+      "main": [
+        [
+          {
+            "node": "Get Install Locations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Location Access Token": {
+      "main": [
+        [
+          {
+            "node": "Scalify Get Custom Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Scalify Get Custom Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Access Token - 2": {
+      "main": [
+        [
+          {
+            "node": "Scalify Update Line Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Verify Access Token": {
+      "main": [
+        [
+          {
+            "node": "Line Get Webhook Endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Line Access Token - 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Custom Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Custom Values": {
+      "main": [
+        [
+          {
+            "node": "Split Custom Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Line Custom Fields Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Line Credentials": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Line Custom Fields Data": {
+      "main": [
+        [
+          {
+            "node": "Set Line Access Token - 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Update Line Access Token": {
+      "main": [
+        [
+          {
+            "node": "Set Line Access Token - 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Line Access Token - 1": {
+      "main": [
+        [
+          {
+            "node": "Line Verify Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Line Access Token - 2": {
+      "main": [
+        [
+          {
+            "node": "Set Line Access Token - 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Line Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter Line Custom Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Custom Values": {
+      "main": [
+        [
+          {
+            "node": "Filter Line Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Put Webhook Endpoint": {
+      "main": [
+        [
+          {
+            "node": "Line Get Webhook Endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Get Webhook Endpoint": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Line Put Webhook Endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Scalify Location Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Line Put Webhook Endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Install Locations": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4e570ecd-c967-4bf1-8425-f75d55cc4a91",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-02T12:05:27.901Z",
+      "updatedAt": "2025-04-02T12:05:27.901Z",
+      "id": "XCMgNVG3Bb8NnshP",
+      "name": "Line"
+    }
+  ]
+}

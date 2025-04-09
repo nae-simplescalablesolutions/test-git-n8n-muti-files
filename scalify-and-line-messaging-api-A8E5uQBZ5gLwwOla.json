@@ -1,0 +1,5165 @@
+{
+  "createdAt": "2025-03-24T07:56:23.675Z",
+  "updatedAt": "2025-04-08T05:43:31.330Z",
+  "id": "A8E5uQBZ5gLwwOla",
+  "name": "Scalify and Line messaging API",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eb037de0-7231-45b1-8518-d6e7fac90fbf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        540
+      ],
+      "id": "8e805b58-c19a-4b88-b194-73fff2ee15af",
+      "name": "Webhook From Scalify",
+      "webhookId": "eb037de0-7231-45b1-8518-d6e7fac90fbf"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e28dc54-2c67-41cd-8078-2f027824e175",
+              "name": "companyId",
+              "value": "PZFL9vwSqYneadvzwWh9",
+              "type": "string"
+            },
+            {
+              "id": "9ed7fd96-a881-4282-957d-ef33a9f64b40",
+              "name": "locationId",
+              "value": "={{ $json.locationId }}",
+              "type": "string"
+            },
+            {
+              "id": "28513789-db76-4631-b8ed-c321557fa5d7",
+              "name": "conversationProviderId",
+              "value": "67eaabdb44fe7f29fa583d6b",
+              "type": "string"
+            },
+            {
+              "id": "0e2443ee-cfb5-4276-bc53-4f06f8ad2255",
+              "name": "webhookSource",
+              "value": "={{ $json.webhookSource }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        160
+      ],
+      "id": "c297a43f-5bb2-413a-8066-159e4a71b1b8",
+      "name": "Set fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        900
+      ],
+      "id": "7141ac38-8e06-45d4-be72-829b1c1451f1",
+      "name": "Respond OK"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"Unauthorized!\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        1060
+      ],
+      "id": "530e7b8a-ae98-42af-94ea-da741476b300",
+      "name": "Respond Unauthorized"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $json.lineId }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "914022e5-ff9b-4870-a6f7-3aa38969fc2d",
+      "name": "Line : Message Loading",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        5960,
+        940
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "72cd3b4e-2611-4709-bf1d-2027157d7218",
+                    "leftValue": "={{ $('Webhook From Scalify').first().json.body.type }}",
+                    "rightValue": "SMS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Live Chat"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1673b760-5c5d-45b9-a20c-7ed54bb39ae3",
+                    "leftValue": "={{ $('Webhook From Scalify').first().json.headers.type }}",
+                    "rightValue": "register",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send Registration Form"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b80b5e8e-f8ae-4eb1-a506-66fd203db915",
+                    "leftValue": "={{ $('Webhook From Scalify').first().json.headers.type }}",
+                    "rightValue": "update form",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Update User Profile"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1b5cdce4-6ddf-4b45-8efb-f6edee386cb7",
+                    "leftValue": "={{ $('Webhook From Scalify').first().json.headers.type }}",
+                    "rightValue": "broadcast",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Broadcast"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4320,
+        1360
+      ],
+      "id": "3fff830b-2e2e-4545-ae82-465204a068ec",
+      "name": "Condition Webhook From Scalify"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Scalify Get Contact By Line Id - 2').first().json.contacts[0].id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"firstName\" : \"{{ $('Check Value Undefined').first().json.first_name }}\",\n  \"lastName\" : \"{{ $('Check Value Undefined').first().json.last_name }}\",\n  \"phone\" : \"{{ $('Check Value Undefined').first().json.phone }}\",\n  \"email\" : \"{{ $('Check Value Undefined').first().json.email }}\",\n  \"dateOfBirth\" : \"{{ $('Check Value Undefined').first().json.date_of_birth }}\",\n  \"address1\" : \"{{ $('Check Value Undefined').first().json.address }}\",\n  \"city\" : \"{{ $('Check Value Undefined').first().json.city }}\",\n  \"state\" : \"{{ $('Check Value Undefined').first().json.state }}\",\n  \"postalCode\" : \"{{ $('Check Value Undefined').first().json.postal_code }}\",\n  \"country\" : \"{{ $('Check Value Undefined').first().json.country }}\",\n\"customFields\": [\n    {\"id\": \"{{ $('Scalify Get Custom Fields').first().json.customFields[40].id }}\", \"field_value\": \"{{ $('Check Value Undefined').first().json.language }}\"}\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5980,
+        1700
+      ],
+      "id": "08335969-cede-471b-97f8-66aa4cb47f5f",
+      "name": "Update Contact",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Webhook From Scalify').first().json.body.customData;\n\nif (data['address'] === \"undefined\") {\n  data['address'] = \"\";\n}\n\nif (data['state'] === \"undefined\") {\n  data['state'] = \"\";\n}\n\nif (data['postal_code'] === \"undefined\"){\n  data['postal_code'] = \"\";\n}\n\nreturn [\n  {\n    json: data\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5240,
+        1700
+      ],
+      "id": "f5d52880-f43e-4995-8514-938444cee12a",
+      "name": "Check Value Undefined"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $('Webhook From Scalify').first().json.body.customData.line_id }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Your profile has been successfully updated.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6200,
+        1700
+      ],
+      "id": "e9310a9f-45c3-41a6-b3f3-2d4db37e7ba2",
+      "name": "Send Message Line suscess",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5760,
+        1700
+      ],
+      "id": "8c96337f-2695-4a10-a134-369a2136291e",
+      "name": "Wait Update",
+      "webhookId": "f48b4841-8254-4249-9bdb-600a2c1c1246"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2da26327-6c08-4849-ac93-b2826c84d0fc",
+                    "leftValue": "={{ $('Webhook From Scalify').first().json.body.attachments }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook From Scalify').first().json.body.attachments }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "e19f89b1-1cdf-4d46-8171-d6d3edf8e912"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        6200,
+        1080
+      ],
+      "id": "614a7070-92ac-4e7f-a16e-cace49cbad74",
+      "name": "message type"
+    },
+    {
+      "parameters": {
+        "url": "https://services.leadconnectorhq.com/conversations/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Scalify Get Contact By Line Id - 1').first().json.total > 0 ? $('Scalify Get Contact By Line Id - 1').first().json.contacts[0].id : $('Scalify Create Contact').first().json.contact.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7580,
+        -2400
+      ],
+      "id": "85578956-9146-4aab-bdd3-01fc0d59d932",
+      "name": "Get Conversation by Contract",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$('Get Conversation by Contract').first().json.total}}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "6bce3497-7129-42ab-9adb-eb703b690e89"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Create Conversation"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2412817a-c37b-40bd-8a96-1b023c837f71",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.message.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5b9f7d46-704a-42e5-ab50-cd129827b467",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.message.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "36b8672d-ebc8-48a4-aeff-b67acd7cc486",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.message.type }}",
+                    "rightValue": "sticker",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sticker"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        7880,
+        -2420
+      ],
+      "id": "59ab5f56-4011-4142-bea8-3fa569caedea",
+      "name": "Condition Type"
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $('Set Line Each Event').first().json.message.id }}/content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9720,
+        -2380
+      ],
+      "id": "da68572c-9aa6-4a0d-9d31-790a5f7b365b",
+      "name": "Get Image From Line",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages/inbound",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"Custom\",\n  \"attachments\": [ \"{{ $json.files[0].url }}\" ],\n  \"conversationId\": \"{{ $('Get Conversation by Contract').first().json.conversations[0].id }}\",\n  \"conversationProviderId\": \"{{ $('Set fields').first().json.conversationProviderId }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10680,
+        -2380
+      ],
+      "id": "7c755a23-722d-46b2-a403-4de08ed50d47",
+      "name": "Send image to Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/:locationId",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c15b7782-f56c-4c2c-b2e6-9ab0196d9763",
+      "name": "Webhook From Line",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -380,
+        -220
+      ],
+      "webhookId": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{ JSON.stringify($('Webhook From Line').first().json.body) }}",
+        "dataPropertyName": "signature",
+        "secret": "={{ $('Line Custom Fields Data').first().json[\"Line Channel Secret\"].value }}",
+        "encoding": "base64"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        640
+      ],
+      "id": "8d2b7995-4bfe-4c15-aaa9-b40e103a4dd5",
+      "name": "Create Line Signature"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e6c4a701-132d-4172-9f0b-a83b85510898",
+              "name": "publicKey",
+              "value": "=-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAokvo/r9tVgcfZ5DysOSC Frm602qYV0MaAiNnX9O8KxMbiyRKWeL9JpCpVpt4XHIcBOK4u3cLSqJGOLaPuXw6 dO0t6Q/ZVdAV5Phz+ZtzPL16iCGeK9po6D6JHBpbi989mmzMryUnQJezlYJ3DVfB csedpinheNnyYeFXolrJvcsjDtfAeRx5ByHQmTnSdFUzuAnC9/GepgLT9SM4nCpv uxmZMxrJt5Rw+VUaQ9B8JSvbMPpez4peKaJPZHBbU3OdeCVx5klVXXZQGNHOs8gF 3kvoV5rTnXV0IknLBXlcKKAQLZcY/Q9rG6Ifi9c+5vqlvHPCUJFT5XUGG5RKgOKU J062fRtN+rLYZUV+BjafxQauvC8wSWeYja63VSUruvmNj8xkx2zE/Juc+yjLjTXp IocmaiFeAO6fUtNjDeFVkhf5LNb59vECyrHD2SQIrhgXpO4Q3dVNA5rw576PwTzN h/AMfHKIjE4xQA1SZuYJmNnmVZLIZBlQAF9Ntd03rfadZ+yDiOXCCs9FkHibELhC HULgCsnuDJHcrGNd5/Ddm5hxGQ0ASitgHeMZ0kcIOwKDOzOU53lDza6/Y09T7sYJ PQe7z0cvj7aE4B+Ax1ZoZGPzpJlZtGXCsu9aTEGEnKzmsFqwcSsnw3JB31IGKAyk T1hhTiaCeIY/OwwwNUY2yvcCAwEAAQ== \n-----END PUBLIC KEY-----",
+              "type": "string"
+            },
+            {
+              "id": "6dc4d43e-6f49-4006-b569-3657c5444754",
+              "name": "webhookBody",
+              "value": "={{ JSON.stringify($json.body) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -200,
+        540
+      ],
+      "id": "d778ad90-d197-471f-8b44-2cbebbb02495",
+      "name": "Set Public Key"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "from cryptography.hazmat.primitives.asymmetric import padding\nfrom cryptography.hazmat.primitives import hashes\nfrom cryptography.hazmat.primitives import serialization\nfrom cryptography.hazmat.primitives.serialization import load_pem_public_key\nimport base64\n\ndef verify_signature(public_key_pem: str, signature: str, payload: dict) -> bool:\n    try:\n        public_key_pem_string = \"\\n\".join(line.strip() for line in public_key_pem.splitlines())\n        public_key_bytes = public_key_pem_string.encode('utf-8')\n        public_key = serialization.load_pem_public_key(public_key_bytes)\n\n        payload_bytes = payload.encode()\n\n        signature_bytes = base64.b64decode(signature)\n\n        public_key.verify(\n            signature_bytes,\n            payload_bytes,\n            padding.PKCS1v15(),\n            hashes.SHA256()\n        )\n        return True\n    except Exception as e:\n        return False\n\ninput_data = _input.item.json\n\npublic_key = input_data.publicKey\n\nif not input_data.headers.get(\"x-wh-signature\", False):\n  return {\"valid\": True}\n\nsignature = input_data.headers[\"x-wh-signature\"]\npayload = input_data.webhookBody\n\n# Perform verification\nis_valid = verify_signature(public_key, signature, payload)\n\nreturn {\"valid\": is_valid}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        540
+      ],
+      "id": "bec9e04f-970c-4d71-b6af-e0ee6a8cb1dc",
+      "name": "Verify Signature"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9e4fd51-566b-409d-b982-0e95a872740b",
+              "leftValue": "={{ $('Webhook From Line').first().json.headers[\"x-line-signature\"] }}",
+              "rightValue": "={{ $json.signature }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2620,
+        640
+      ],
+      "id": "0f3ea898-57cd-4ce1-bd02-59a476eb6999",
+      "name": "Line Is Valid Signature?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9e4fd51-566b-409d-b982-0e95a872740b",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "={{ $json.signature }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        540
+      ],
+      "id": "2c47ff43-ed40-408c-b34b-8252389d0d37",
+      "name": "Scalify Is Valid Signature?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f739ebf2-3738-4325-a627-f592e4cd0533",
+              "name": "webhookSource",
+              "value": "highlevel",
+              "type": "string"
+            },
+            {
+              "id": "4fe11887-366a-4473-939c-634c1927021c",
+              "name": "locationId",
+              "value": "={{ $('Webhook From Scalify').item.json.body.locationId || $('Webhook From Scalify').item.json.body.location?.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        520
+      ],
+      "id": "3e0e584f-9cb7-4b3c-91b9-bc13368a3b2a",
+      "name": "Set Source Scalify"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95e68d41-053d-40f9-880f-1971f2e7d9e6",
+              "name": "webhookSource",
+              "value": "line",
+              "type": "string"
+            },
+            {
+              "id": "92be1a38-1d0b-4da0-af33-53e2e098b3d0",
+              "name": "locationId",
+              "value": "={{ $('Webhook From Line').item.json.params.locationId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        -220
+      ],
+      "id": "12578ebb-a0ee-4451-a2be-d8a387fce29d",
+      "name": "Set Source Line"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set fields').first().json.webhookSource }}",
+                    "rightValue": "line",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a2a916f8-3b7a-4a57-ae93-17b2c0d494c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Line"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c4cfb3ac-5b88-4f9c-83d1-28765580b212",
+                    "leftValue": "={{ $('Set fields').first().json.webhookSource }}",
+                    "rightValue": "highlevel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Scalify"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3580,
+        120
+      ],
+      "id": "0cb9cf17-359f-4ae2-b094-360ce71d55d0",
+      "name": "Switch Source"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/oauth/locationToken",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "highLevelOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "companyId",
+              "value": "={{ $('Set fields').item.json.companyId }}"
+            },
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').item.json.locationId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8230bb34-9c7f-4c51-a28c-16b328145bff",
+      "name": "Scalify Location Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        160
+      ],
+      "credentials": {
+        "highLevelOAuth2Api": {
+          "id": "JNMcHEe5dnI4P2Xz",
+          "name": "Scalify Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/accessToken",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "={{ $('Line Custom Fields Data').first().json[\"Line Channel ID\"].value }}"
+            },
+            {
+              "name": "client_secret",
+              "value": "={{ $('Line Custom Fields Data').first().json[\"Line Channel Secret\"].value }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2840,
+        -320
+      ],
+      "id": "5fb4d948-5154-4747-b6ba-5c4d33969cd2",
+      "name": "Line Access Token - 2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/oauth/verify",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $json.line_access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3200,
+        140
+      ],
+      "id": "ed78a915-0fdb-4e18-a5f1-e187c58a37db",
+      "name": "Line Verify Access Token",
+      "retryOnFail": true,
+      "waitBetweenTries": 300,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Webhook From Line').first().json.body.events;\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4340,
+        -500
+      ],
+      "id": "0376e297-3595-4da0-bc56-dca4ad9eb3b9",
+      "name": "Extract Line Events"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4660,
+        -500
+      ],
+      "id": "5f528aaa-b5b7-45db-9f42-7cd98bbbe480",
+      "name": "Loop Line Events"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5220,
+        -1220
+      ],
+      "id": "ca54d74c-7c5d-4a57-97bf-2e478c554c5b",
+      "name": "Set Line Each Event"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.line.me/v2/bot/profile/{{ $('Set Line Each Event').first().json.source.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6300,
+        -2160
+      ],
+      "id": "7c2386b3-5b56-4bc6-95df-7d3f28ec44fc",
+      "name": "Line User Profile",
+      "retryOnFail": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "053b92b1-c2b8-40b1-a1bc-5b88d57dd8ab",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6960,
+        -1840
+      ],
+      "id": "787996b7-6832-4911-9d6d-c0cbfbc9084f",
+      "name": "Is Valid Contact Id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').first().json.locationId }}\",\n  \"firstName\": \"{{$('Line User Profile').first().json.displayName}}\",\n  \"lastName\": \"\",\n  \"phone\": \"\",\n  \"customFields\": [\n    {\"id\": \"{{ $('Line Custom Fields Data').first().json[\"Line ID\"].id }}\", \"field_value\": \"{{$('Line User Profile').first().json.userId}}\"}\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7340,
+        -1780
+      ],
+      "id": "21dc1e43-3e44-49a4-ad21-67f49237f10d",
+      "name": "Scalify Create Contact",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Scalify Get Contact By Line Id - 1').first().json.total > 0 ? $('Scalify Get Contact By Line Id - 1').first().json.contacts[0].id : $json.contact.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7560,
+        -1680
+      ],
+      "id": "6baa5f0b-328e-4b86-97cc-dc9638a7d75b",
+      "name": "Scalify Create Conversation",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1177c874-da69-4753-82ee-e03fa6fde5dc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3489aff-8287-419f-95ae-2c7dca079660",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+                    "rightValue": "follow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Follow"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "24e45085-c9db-4259-922e-0c21072b83b5",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+                    "rightValue": "unfollow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Unfollow"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        7340,
+        -2220
+      ],
+      "id": "7f32dc9d-6e62-494e-baea-72067e2bb24b",
+      "name": "Switch Event Type"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/conversations/messages/{{ $json.id }}/status",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n   \"status\": \"read\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10800,
+        -2980
+      ],
+      "id": "7ad1cc02-dfc1-47cd-ba31-86de9d4740c9",
+      "name": "Update Message Status To Read",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/locations/{{$json.locationId}}/customFields",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "contact"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        -80
+      ],
+      "id": "732077a3-a7c9-4f96-bebd-728d3906e9d4",
+      "name": "Scalify Get Custom Fields",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/locations/{{$json.locationId}}/customValues",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        360
+      ],
+      "id": "1ca9b8cd-5f59-4b6f-902e-c71439443578",
+      "name": "Scalify Get Custom Values",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2200,
+        140
+      ],
+      "id": "dc9f414c-a9df-41a4-9ea9-d5c5ccb2961b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7aa8577d-a789-4b6d-b6a8-f252812e9862",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "{{ custom_values.line_channel_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "291d9eeb-e472-47ed-958e-3227137c46d3",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "{{ custom_values.line_channel_secret }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "3cb44d9c-1578-4b11-bf48-5d558c905415",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "{{ custom_values.line_access_token }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1940,
+        360
+      ],
+      "id": "6ae03df4-280c-4fe5-b91c-4a4ed088c6e3",
+      "name": "Filter Line Credentials"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst lineData = {}\n\nfor (const item of $input.all()) {\n  lineData[item.json?.name] = {\n    \"id\" : item.json?.id,\n    \"locationId\" : item.json?.locationId,\n    \"value\" : item.json?.value,\n    \"name\" : item.json?.name\n  }\n}\n\nreturn lineData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        140
+      ],
+      "id": "3b26630a-5894-414f-b8a8-a5560279e8e3",
+      "name": "Line Custom Fields Data"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/locations/{{ $('Set fields').first().json.locationId }}/customValues/{{ $('Line Custom Fields Data').first().json[\"Line Access Token\"].id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "=Line Access Token"
+            },
+            {
+              "name": "value",
+              "value": "={{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3060,
+        -320
+      ],
+      "id": "75359b74-81b6-47b6-800b-c880eceac67f",
+      "name": "Scalify Update Line Access Token",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0418af2c-14b6-4e5f-8543-ff61dd17a03f",
+              "name": "line_access_token",
+              "value": "={{ $json[\"Line Access Token\"].value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2960,
+        140
+      ],
+      "id": "2dab14c0-e2a5-42ed-b3d8-8f62863d7d76",
+      "name": "Set Line Access Token - 1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "452d187c-c7d8-4c13-b4ad-d466ff42fce4",
+              "name": "Line Access Token",
+              "value": "={\n  \"value\" : \"{{ $json.customValue.value }}\"\n}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3280,
+        -320
+      ],
+      "id": "5d4e2b0e-4451-40c6-94ad-99f23c317382",
+      "name": "Set Line Access Token - 2"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Scalify Get Contact By Line Id - 1').first().json.total > 0 ? $('Scalify Get Contact By Line Id - 1').first().json.contacts[0].id : $('Scalify Create Contact').first().json.contact.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customFields\":[{\"id\":\"{{ $('Line Custom Fields Data').first().json['Line Status'].id }}\",\"value\":\"{{ $('Set Line Each Event').first().json.type }}\"}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6680,
+        -2680
+      ],
+      "id": "125ac6bf-1616-46ff-b311-fe07f22234b9",
+      "name": "Scalify Update Contact",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7aa8577d-a789-4b6d-b6a8-f252812e9862",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.line_id",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c7a6c11f-c0dc-4aa7-8ebc-29f26e7f42a6",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.line_status",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e29c3d9f-353b-478c-b9e8-7664c6f1425e",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.line_source_type",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "8f01fecd-d5a2-49d8-88bc-b1756cb1b46d",
+              "leftValue": "={{ $json.fieldKey }}",
+              "rightValue": "contact.language",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1940,
+        -80
+      ],
+      "id": "c226ebd9-0889-4983-8f2b-3087228690b5",
+      "name": "Filter Line Custom Fields"
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Webhook From Scalify').first().json.body.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5040,
+        1060
+      ],
+      "id": "c816349d-6f78-47b2-82cc-f33a5b057298",
+      "name": "Scalify Get Contact",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "customFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        -80
+      ],
+      "id": "9ad3de0a-d5c5-46a4-af9c-ef603a7d908f",
+      "name": "Split Custom Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "customValues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        360
+      ],
+      "id": "6ccd223e-c538-4516-b0a1-0995966eee5e",
+      "name": "Split Custom Values"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "contact.customFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        5260,
+        1060
+      ],
+      "id": "c3cef61d-9737-45dd-bad0-41e774d03e30",
+      "name": "Split Contact Custom Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $('Set Line Custom Field').item.json.lineId }}\",\n  \"messages\": [\n    {\n      \"type\": \"image\",\n  \"originalContentUrl\": \"{{ $('Webhook From Scalify').first().json.body.attachments[0] }}\",\n  \"previewImageUrl\": \"{{ $('Webhook From Scalify').first().json.body.attachments[0] }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7020,
+        1560
+      ],
+      "id": "b08959e1-b129-4764-9e6e-30bf2ffa9528",
+      "name": "Line Push Image Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $('Webhook From Scalify').first().json.body['Line ID'] }}\",\n  \"messages\": [\n    {\n      \"type\": \"flex\",\n      \"altText\": \"Hello, customer\",\n\"header\": {\n    \"type\": \"box\",\n    \"layout\": \"vertical\",\n    \"contents\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Hello, customer\"\n      }\n    ]\n  },\n      \"contents\": {\n        \"type\": \"bubble\",\n        \"body\": {\n          \"type\": \"box\",\n          \"layout\": \"horizontal\",\n          \"contents\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"This is form User Profile.\",\n              \"wrap\": true\n            }\n          ]\n        },\n        \"footer\": {\n          \"type\": \"box\",\n          \"layout\": \"horizontal\",\n          \"contents\": [\n            {\n              \"type\": \"button\",\n              \"style\": \"primary\",\n              \"height\": \"sm\",\n              \"action\": {\n                \"type\": \"uri\",\n                \"label\": \"User Profile\",\n                \"uri\": \"{{ $('Webhook From Scalify').first().json.body.customData.message }}\"\n              }\n            }\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5240,
+        1360
+      ],
+      "id": "ec4f6c22-f85a-4ea8-9824-4f09739dbd18",
+      "name": "Line Push Register Link Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').first().json.locationId }}\",\n  \"pageLimit\": 20,\n  \"filters\": [\n    {\n      \"group\": \"AND\",\n      \"filters\": [\n        {\n          \"field\": \"customFields.{{ $('Line Custom Fields Data').first().json[\"Line ID\"].id }}\",\n          \"operator\": \"eq\",\n          \"value\": \"{{ $('Webhook From Scalify').first().json.body.customData.line_id }}\"\n        },\n        {\n          \"field\": \"id\",\n          \"operator\": \"not_eq\",\n          \"value\": \"{{ $('Webhook From Scalify').first().json.body.contact_id }}\"\n        }\n      ]\n    }\n  ],\n  \"sort\": [\n    {\n      \"field\": \"id\",\n      \"direction\": \"asc\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5020,
+        1700
+      ],
+      "id": "50476279-e4b1-4a24-9b93-305449cf6e69",
+      "name": "Scalify Get Contact By Line Id - 2",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').first().json.locationId }}\",\n  \"pageLimit\": 20,\n  \"filters\":[{\"field\":\"customFields.{{ $('Line Custom Fields Data').first().json[\"Line ID\"].id }}\",\"operator\":\"eq\",\"value\":\"{{ $('Set Line Each Event').first().json.type === 'unfollow' ? $('Set Line Each Event').first().json.source.userId : $('Line User Profile').first().json.userId}}\"}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6600,
+        -1940
+      ],
+      "id": "36a12f33-65ec-4e89-96a7-ae1823b4f9e7",
+      "name": "Scalify Get Contact By Line Id - 1",
+      "notesInFlow": false,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages/inbound",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"Custom\",\n  \"message\": \"{{ $('Clean Text Sclify').first().json.output}}\",\n   \"conversationId\": \"{{ $('Get Conversation by Contract').first().json.conversations[0].id }}\",\n  \"conversationProviderId\": \"{{ $('Set fields').first().json.conversationProviderId }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9400,
+        -3000
+      ],
+      "id": "27f310ec-c828-4df3-9d8e-68932496f511",
+      "name": "Push Message To Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01c269b1-39dc-4713-bd9d-951f5259228c",
+              "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+              "rightValue": "unfollow",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6020,
+        -1960
+      ],
+      "id": "2371a96d-1b26-4ffb-8cd2-4cabb67b6965",
+      "name": "Is Not Unfollow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/medias/upload-file",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "parentId",
+              "value": "67e5335e1870f460d440f077"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10200,
+        -2380
+      ],
+      "id": "49658000-316b-42f0-9592-b0085dff5f33",
+      "name": "Upload to scalify",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://services.leadconnectorhq.com/medias/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "altId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "altType",
+              "value": "location"
+            },
+            {
+              "name": "sortBy",
+              "value": "createdAt"
+            },
+            {
+              "name": "sortOrder",
+              "value": "asc"
+            },
+            {
+              "name": "query",
+              "value": "={{ $(\"Set Line Each Event\").first().json.message.id }}"
+            },
+            {
+              "name": "parentId",
+              "value": "67e5335e1870f460d440f077"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10440,
+        -2380
+      ],
+      "id": "a2b40156-c0f7-49d7-979c-fdf2bda8b04b",
+      "name": "Get image in scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $(\"Set Line Each Event\").first().json.message.id\n\n$input.item.binary.data.fileName =`${id}.jpg`\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9980,
+        -2380
+      ],
+      "id": "a69d60fc-4c85-4588-ba72-72461184f1b4",
+      "name": "Rename image"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b51c5cd0-05ca-4407-85b3-1d62a0890b72",
+              "leftValue": "={{ $('Set fields').first().json.webhookSource }}",
+              "rightValue": "line",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2580,
+        140
+      ],
+      "id": "1ed5334e-1f8d-4d03-8e3d-1fd57920cfe2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "Custom"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Webhook From Scalify').first().json.body.contact_id }}"
+            },
+            {
+              "name": "message",
+              "value": "[Auto-Reply] Sent update profile message"
+            },
+            {
+              "name": "conversationProviderId",
+              "value": "={{ $('Set fields').first().json.conversationProviderId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5460,
+        1360
+      ],
+      "id": "d9e7fecb-edbe-47f7-b936-5a91acccafeb",
+      "name": "Add Register Message To Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "Custom"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Scalify Get Contact By Line Id - 2').first().json.contacts[0].id }}"
+            },
+            {
+              "name": "message",
+              "value": "[Auto-Reply]  ✅ Profile updated successfully"
+            },
+            {
+              "name": "conversationProviderId",
+              "value": "={{ $('Set fields').first().json.conversationProviderId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6400,
+        1700
+      ],
+      "id": "c07b3bc9-e415-48f6-99d8-0642e485c167",
+      "name": "Add Updated Profile Message To Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Webhook From Scalify').first().json.body.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5500,
+        1700
+      ],
+      "id": "964c92d2-9262-45bf-ba31-8ad0fbe5330e",
+      "name": "Delete Contact",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/conversations/{{ $('Webhook From Scalify').first().json.body.conversationId }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"limit\": 5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7900,
+        1060
+      ],
+      "id": "50cabe51-f562-44a8-b4ce-43f4ee3c1df3",
+      "name": "Get Pending Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bad50af3-9a4c-481e-b351-a6ee3dc6100a",
+              "leftValue": "={{ $json.direction }}",
+              "rightValue": "outbound",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9d25f163-d582-42fa-80ea-292bd489d552",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "={{ \"pending\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        8380,
+        1060
+      ],
+      "id": "573da35a-b93d-410e-9368-7eebb74a85ef",
+      "name": "Filter Pending Message"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        8660,
+        1060
+      ],
+      "id": "217b6b4f-850c-4e3c-a9f7-457eb4272edd",
+      "name": "Loop Pending Message",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/conversations/messages/{{ $json.id }}/status",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n   \"status\": \"delivered\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9060,
+        1080
+      ],
+      "id": "cbb6b5a9-5f5a-435c-958e-a42025e31813",
+      "name": "Update Message Status To Delivered",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/conversations/{{ $('Get Conversation by Contract').first().json.conversations[0].id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"limit\": 5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9700,
+        -3000
+      ],
+      "id": "2244baa0-ecfc-4520-80f4-981a9120ce5b",
+      "name": "Get Delivered Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "messages.messages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        9960,
+        -3000
+      ],
+      "id": "f2f55679-d957-4e67-b53b-bd7412b725c9",
+      "name": "Split Out Delivered Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bad50af3-9a4c-481e-b351-a6ee3dc6100a",
+              "leftValue": "={{ $json.direction }}",
+              "rightValue": "outbound",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9d25f163-d582-42fa-80ea-292bd489d552",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "={{ \"d\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        10200,
+        -3000
+      ],
+      "id": "1465e5c7-d8e3-45d5-aaf7-78f5d87c2176",
+      "name": "Filter Delivered Message"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        10480,
+        -3000
+      ],
+      "id": "ef72d7f5-4904-4fb7-b999-d0585efcaeb8",
+      "name": "Loop Delivered Message",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "messages.messages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        8140,
+        1060
+      ],
+      "id": "fbeec8e0-69b0-4cd0-ad46-fe8937eb34a8",
+      "name": "Split Out Pending Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $('Webhook From Scalify').first().json.body['Line ID'] }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "c776080d-db2c-4726-bb23-5d6de49d5364",
+      "name": "Line : Message Loading1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        5020,
+        1360
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{$('Set Line Each Event').first().json.source.userId}}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "9bd13f09-97a6-4527-9918-5b41f351d2b8",
+      "name": "Line : Message Loading2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        8760,
+        -3260
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6c54faed-f8e4-445d-b255-3332fbf16f6b",
+              "leftValue": "={{ $('Webhook From Line').first().json.body.events[0].message.text }}",
+              "rightValue": "update_profile",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        8300,
+        -2960
+      ],
+      "id": "c3081a8e-3650-4cec-8d40-fd08c7c31946",
+      "name": "Check Message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "11a5d8c1-61dc-47d6-980f-1cfd9985d81c",
+              "leftValue": "={{ $('Set Line Each Event').first().json.source.type }}",
+              "rightValue": "group",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5440,
+        -1220
+      ],
+      "id": "7122fe56-a7aa-4605-b212-1b6c1ba284be",
+      "name": "Is Line Group"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        6500,
+        1020
+      ],
+      "id": "799f4675-315c-4e53-a49e-f3bc49070741",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "skTVeTXBEmAytnLh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const cleanedOutput = $input.first().json.output.includes(\"\\n\") \n  ? $input.first().json.output.replace(/\\n/g, \"\") \n  : $input.first().json.output;\n\nreturn [{\n  json: { output: cleanedOutput }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6920,
+        840
+      ],
+      "id": "c192c40e-c888-419b-a9e6-3c6481b9912e",
+      "name": "Clean Text"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Take the message from {{ $('Webhook From Scalify').first().json.body.message }} and the target language is {{ $('Set Line Custom Field').first().json.language }}.\n\nInstructions:\n\nIf the language is null or not provided, do not translate the message—just do the formatting.\n\nIf a language is provided, translate the message (excluding mentions) into that language.\n\nIn the message:\n\nReplace the first occurrence of any @Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx with {user1}, the second with {user2}, and so on (up to as many as appear).\n\nReplace all @all with {everyone}.\n\nKeep the rest of the message text and translate it based on the target language if it's provided.\n\nOutput only the final formatted and translated string.\n\nExamples:\n\nInput: @Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx @all Hello Welcome!\nOutput (if language is Thai): {user1} {everyone} ยินดีต้อนรับ\n\nInput: @Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Hello Welcome! @Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxz @Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxy\nOutput (if language is Thai): {user1} ยินดีต้อนรับ {user2} {user3}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        6560,
+        840
+      ],
+      "id": "5a3c1c28-aa9e-494c-8c9c-40e9f2888baf",
+      "name": "Translate Language Scalify to Line"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        8740,
+        -2740
+      ],
+      "id": "7083e140-4890-4da9-8a96-d6eeec266b94",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "skTVeTXBEmAytnLh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Take the message from:\n{{ $('Webhook From Line').first().json.body.events[0].message.text }}\n\nThe target language is: english\n\nInstructions:\n\nIf the target language is null or not provided, do not translate. Return the original message.\n\nIf the target language is provided, translate the message into that language.\n\nReturn only the final result in this format:\nif target language is equal to original message => original message\nif target language is not equal to original message => original message, translate message\n\nExamples:\n\nInput: ....\nOutput: ....\n\nInput: 123456\nOutput: 123456\n\nInput: Hello (language: English)\nOutput: Hello\n\nInput: สวัสดี (language: Thai)\nOutput: สวัสดี\n\nInput: สวัสดี (language: English)\nOutput: สวัสดี, Hello\n\nInput: เสียงฝนโปรยลงมาท่ามกลางความเงียบสงบ ชวนให้รู้สึกอบอุ่นในใจอย่างบอกไม่ถูก (language: null)\nOutput: เสียงฝนโปรยลงมาท่ามกลางความเงียบสงบ ชวนให้รู้สึกอบอุ่นในใจอย่างบอกไม่ถูก\n\nOnly return the final result. Do not include any explanation.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        8740,
+        -3000
+      ],
+      "id": "37082655-3617-41c9-a260-e81733779049",
+      "name": "Translate Language Line to Scalify"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cleanedOutput = $input.first().json.output.includes(\"\\n\") \n  ? $input.first().json.output.replace(/\\n/g, \"\") \n  : $input.first().json.output;\n\nreturn [{\n  json: { output: cleanedOutput }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9140,
+        -3000
+      ],
+      "id": "f2e1c95f-060e-430e-8315-e5f923e8d469",
+      "name": "Clean Text Sclify"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01c269b1-39dc-4713-bd9d-951f5259228c",
+              "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+              "rightValue": "leave",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5920,
+        -160
+      ],
+      "id": "495e1374-5143-47c6-831a-80b3e868542c",
+      "name": "Is Not Leave"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.line.me/v2/bot/group/{{ $('Set Line Each Event').first().json.source.groupId }}/summary",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6300,
+        -360
+      ],
+      "id": "82437223-7592-4b39-9a45-78e6862b4a26",
+      "name": "Line Group Profile",
+      "retryOnFail": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').first().json.locationId }}\",\n  \"firstName\": \"{{$('Line Group Profile').first().json.groupName}}\",\n  \"lastName\": \"[Group]\",\n  \"phone\": \"\",\n  \"customFields\": [\n    {\"id\": \"{{ $('Line Custom Fields Data').first().json[\"Line ID\"].id }}\", \"field_value\": \"{{$('Line Group Profile').first().json.groupId}}\"}\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7440,
+        20
+      ],
+      "id": "a12b4455-a704-4f0d-88be-59901b51bae1",
+      "name": "Scalify Create Contact [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').first().json.locationId }}\",\n  \"pageLimit\": 20,\n  \"filters\":[{\"field\":\"customFields.{{ $('Line Custom Fields Data').first().json[\"Line ID\"].id }}\",\"operator\":\"eq\",\"value\":\"{{ $('Set Line Each Event').first().json.type === 'leave' ? $('Set Line Each Event').first().json.source.groupId : $('Line Group Profile').first().json.groupId}}\"}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6720,
+        -140
+      ],
+      "id": "99ea4a9d-4860-4575-a2b6-2a1a4cf9ba74",
+      "name": "Scalify Get Contact By Line Id [Group]",
+      "notesInFlow": false,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Scalify Get Contact By Line Id [Group]').first().json.total > 0 ? $('Scalify Get Contact By Line Id [Group]').first().json.contacts[0].id : $json.contact.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7660,
+        120
+      ],
+      "id": "d96e41cc-21d8-4faa-af5e-84058fcfe575",
+      "name": "Scalify Create Conversation [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('Scalify Get Contact By Line Id [Group]').first().json.total > 0 ? $('Scalify Get Contact By Line Id [Group]').first().json.contacts[0].id : $('Scalify Create Contact [Group]').first().json.contact.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customFields\":[{\"id\":\"{{ $('Line Custom Fields Data').first().json['Line Status'].id }}\",\"value\":\"{{ $('Set Line Each Event').first().json.type }}\"},{\"id\":\"{{ $('Line Custom Fields Data').first().json['Line Source Type'].id }}\",\"value\":\"{{ $('Set Line Each Event').first().json.source.type }}\"}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6780,
+        -880
+      ],
+      "id": "4fd4144e-f055-48fa-ad80-49b0551fb7f7",
+      "name": "Scalify Update Contact [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://services.leadconnectorhq.com/conversations/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Scalify Get Contact By Line Id [Group]').first().json.total > 0 ? $('Scalify Get Contact By Line Id [Group]').first().json.contacts[0].id : $('Scalify Create Contact [Group]').first().json.contact.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7920,
+        -600
+      ],
+      "id": "5485926f-cf6a-4ff6-bbd0-5e5169961316",
+      "name": "Get Conversation by Contract [Group]",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages/inbound",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"Custom\",\n  \"message\": \"User ID: {{ $('Line Group User Profile').first().json.userId }}\\nName: {{ $('Line Group User Profile').first().json.displayName }}\\nMessage: {{ $('Set Line Each Event').first().json.message.text }}\",\n   \"conversationId\": \"{{ $('Get Conversation by Contract [Group]').first().json.conversations[0].id }}\",\n  \"conversationProviderId\": \"{{ $('Set fields').first().json.conversationProviderId }}\",\n  \"direction\": \"inbound\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8600,
+        -1180
+      ],
+      "id": "207f0921-7cbc-45fe-a5ae-aa269a390a98",
+      "name": "Push Message To Scalify [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://services.leadconnectorhq.com/conversations/{{ $('Get Conversation by Contract [Group]').first().json.conversations[0].id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"limit\": 5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8960,
+        -1180
+      ],
+      "id": "96bc6df4-77d6-4989-93a8-bb92fa788b10",
+      "name": "Get Delivered Message [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "messages.messages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        9220,
+        -1180
+      ],
+      "id": "c13978b3-e610-4b04-8262-cf5d11d36c09",
+      "name": "Split Out Delivered Message [Group]"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bad50af3-9a4c-481e-b351-a6ee3dc6100a",
+              "leftValue": "={{ $json.direction }}",
+              "rightValue": "outbound",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9d25f163-d582-42fa-80ea-292bd489d552",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "={{ \"d\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        9460,
+        -1180
+      ],
+      "id": "a95643d1-018f-47aa-8d26-aa8b6a23f5e1",
+      "name": "Filter Delivered Message [Group]"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        9740,
+        -1180
+      ],
+      "id": "0f27d6b6-06db-4b4d-aa7a-bf20d1de27e5",
+      "name": "Loop Delivered Message [Group]",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://services.leadconnectorhq.com/conversations/messages/{{ $json.id }}/status",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n   \"status\": \"read\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10060,
+        -1160
+      ],
+      "id": "fc49ed70-a125-4b1d-a7ba-77701fd83ae4",
+      "name": "Update Message Status To Read [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $('Set Line Each Event').first().json.message.id }}/content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8960,
+        -580
+      ],
+      "id": "6be33087-6643-4112-9cbb-8695b1dbe9f0",
+      "name": "Get Image From Line [Group]",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $(\"Set Line Each Event\").first().json.message.id\n\n$input.item.binary.data.fileName =`${id}.jpg`\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9220,
+        -580
+      ],
+      "id": "4e8272ad-a6b5-4d02-9eb6-5a7db36bc1e9",
+      "name": "Rename image [Group]"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/medias/upload-file",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "parentId",
+              "value": "67e5335e1870f460d440f077"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9440,
+        -580
+      ],
+      "id": "2d3f9800-def3-4afa-b0b6-ea0b95fdc694",
+      "name": "Upload to scalify [Group]",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://services.leadconnectorhq.com/medias/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "altId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "altType",
+              "value": "location"
+            },
+            {
+              "name": "sortBy",
+              "value": "createdAt"
+            },
+            {
+              "name": "sortOrder",
+              "value": "asc"
+            },
+            {
+              "name": "query",
+              "value": "={{ $(\"Set Line Each Event\").first().json.message.id }}"
+            },
+            {
+              "name": "parentId",
+              "value": "67e5335e1870f460d440f077"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9720,
+        -580
+      ],
+      "id": "e580345e-7cf7-4325-a33b-a4733917e996",
+      "name": "Get image in scalify [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages/inbound",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"type\": \"Custom\",\n  \"message\": \"User ID: {{ $('Line Group User Profile').first().json.userId }}\\nName: {{ $('Line Group User Profile').first().json.displayName }}\",\n  \"attachments\": [ \"{{ $json.files[0].url }}\" ],\n  \"conversationId\": \"{{ $('Get Conversation by Contract [Group]').first().json.conversations[0].id }}\",\n  \"conversationProviderId\": \"{{ $('Set fields').first().json.conversationProviderId }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10060,
+        -580
+      ],
+      "id": "71f21871-b64a-4a24-a815-c0c2d79fb592",
+      "name": "Send image to Scalify [Group]",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$('Get Conversation by Contract [Group]').first().json.total}}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "6bce3497-7129-42ab-9adb-eb703b690e89"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Create Conversation"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2412817a-c37b-40bd-8a96-1b023c837f71",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.message.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5b9f7d46-704a-42e5-ab50-cd129827b467",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.message.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "36b8672d-ebc8-48a4-aeff-b67acd7cc486",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.message.type }}",
+                    "rightValue": "sticker",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sticker"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        8260,
+        -620
+      ],
+      "id": "0fd6ee97-14a0-45d6-864b-89750991792d",
+      "name": "Condition Type [Group]"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.line.me/v2/bot/group/{{ $('Set Line Each Event').first().json.source.groupId }}/member/{{ $('Set Line Each Event').first().json.source.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7700,
+        -600
+      ],
+      "id": "2f778f87-1dd6-49f5-8ed2-66f96e709798",
+      "name": "Line Group User Profile",
+      "retryOnFail": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1177c874-da69-4753-82ee-e03fa6fde5dc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3489aff-8287-419f-95ae-2c7dca079660",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+                    "rightValue": "join",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Join"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "24e45085-c9db-4259-922e-0c21072b83b5",
+                    "leftValue": "={{ $('Set Line Each Event').first().json.type }}",
+                    "rightValue": "leave",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Leave"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        7440,
+        -420
+      ],
+      "id": "7248049e-11a0-49d4-a4a8-19081abfa355",
+      "name": "Switch Event Type [Group]"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9271b619-57ac-46b6-abea-dec2c17cc3c9",
+              "name": "lineId",
+              "value": "={{ \n  $input.all().find(item => \n    item.json.id === $('Line Custom Fields Data').first().json['Line ID'].id\n  )?.json.value \n}}",
+              "type": "string"
+            },
+            {
+              "id": "7385aae2-d437-43dc-ab84-a2641f880f54",
+              "name": "language",
+              "value": "={{ $input.all().find(item => item.json.id === $('Line Custom Fields Data').first().json['Language'].id)?.json.value  }}",
+              "type": "string"
+            },
+            {
+              "id": "d26e14e3-acd0-49ab-8528-3241794977a3",
+              "name": "lineSourceType",
+              "value": "={{ $input.all().find(item => item.json.id === $('Line Custom Fields Data').first().json['Line Source Type'].id)?.json.value  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5480,
+        1060
+      ],
+      "id": "bad6b1e5-09b0-480c-bae5-e5d68fdb9639",
+      "name": "Set Line Custom Field",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2737e39d-05f2-4217-ad9f-7fa33288299f",
+              "leftValue": "={{ $json.lineSourceType }}",
+              "rightValue": "group",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5700,
+        1060
+      ],
+      "id": "16afecc1-82a9-44ad-8493-82a9de99c07c",
+      "name": "Is Group Chat"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "053b92b1-c2b8-40b1-a1bc-5b88d57dd8ab",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        7060,
+        -40
+      ],
+      "id": "fc6faef7-9053-455e-94e1-114c9af83c41",
+      "name": "Is Valid Contact Id [Group]"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $('Set Line Custom Field').first().json.lineId }}\",\n  \"messages\": [{{ JSON.stringify($json) }}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        7380,
+        840
+      ],
+      "id": "d21bce99-7b74-414e-9d8b-c0ed65578e5d",
+      "name": "Line Push Text Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfunction hasMention(message) {\n  const userMentionRegex = /@U[a-zA-Z0-9]{20,}/;\n  const allMentionRegex = /@all/;\n  return userMentionRegex.test(message) || allMentionRegex.test(message);\n}\n\nfunction generateTextV2Object(message) {\n  const mentionRegex = /@U[a-zA-Z0-9]{20,}/g;\n  const mentions = [...new Set(message.match(mentionRegex) || [])];\n  const substitution = {};\n\n  // Replace user mentions with {userX}\n  mentions.forEach((mention, index) => {\n    const key = `user${index + 1}`;\n    substitution[key] = {\n      type: \"mention\",\n      mentionee: {\n        type: \"user\",\n        userId: mention.slice(1) // remove '@'\n      }\n    };\n  });\n\n  // Replace @all with {everyone}\n  if (message.includes(\"@all\")) {\n    substitution[\"everyone\"] = {\n      type: \"mention\",\n      mentionee: {\n        type: \"all\"\n      }\n    };\n  }\n\n  return substitution;\n}\n\nconst inputMessage = $('Webhook From Scalify').first().json.body.message;\n\nconst substitution = generateTextV2Object(inputMessage);\n\nconst finalMessage = {\n  \"type\" : \"text\",\n  \"text\" : $('Clean Text').first().json.output\n}\n\nif (hasMention(inputMessage)) {\n  finalMessage.type = \"textV2\";\n  finalMessage[\"substitution\"] = substitution;\n}\n\nreturn [\n  {\n    json: finalMessage\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7140,
+        840
+      ],
+      "id": "15d2d467-b9c1-4bbd-bc74-395b1ce1d1f7",
+      "name": "Check Group Mention"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Webhook From Scalify').first().json.body;\nconst output = [];\n\nif (data['Type Message'] === \"text\") {\n  output.push({\n    json: {\n      type: \"text\",\n      text: data.Message\n    }\n  });\n} else if (data['Type Message'] === \"photo\") {\n  output.push({\n    json: {\n      type: \"image\",\n      originalContentUrl: data['Image Message'][0],\n      previewImageUrl: data['Image Message'][0]\n    }\n  });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5020,
+        2040
+      ],
+      "id": "fb1d9e5a-cd52-4d8e-bdb6-d67ef0ed5ad3",
+      "name": "Set text Object Baordcast"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/broadcast",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messages\":[{{$('Set text Object Baordcast').first().json.toJsonString()}}]}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5260,
+        2040
+      ],
+      "id": "608dd4e3-b443-4b47-be6e-168fd5bf9d34",
+      "name": "Send Broadcast Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"locationId\": \"{{ $('Set fields').first().json.locationId }}\",\n  \"pageLimit\": 20,\n  \"filters\":[{\"field\":\"customFields.{{ $('Line Custom Fields Data').first().json[\"Line ID\"].id }}\",\"operator\":\"not_eq\",\"value\":\"\"}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5500,
+        2040
+      ],
+      "id": "7f2656b9-1772-440c-927e-af3ec3e42adc",
+      "name": "Get Contact Line Id From Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "contacts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        5740,
+        2040
+      ],
+      "id": "db4f4558-4fba-46d1-9833-5c133f2ff968",
+      "name": "Split Out Data",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        6000,
+        2040
+      ],
+      "id": "d486265d-197c-4910-8a3d-89b1b1265104",
+      "name": "Loop Over Contact",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://services.leadconnectorhq.com/conversations/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "locationId",
+              "value": "={{ $('Set fields').first().json.locationId }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6320,
+        2060
+      ],
+      "id": "176f3055-75a5-4635-9b54-3db56847bcd2",
+      "name": "Get Conversation By Contact Line Id",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Webhook From Scalify').first().json.body;\nconst output = [];\n\nif (data['Type Message'] === \"text\") {\n  output.push({\n    json: {\n      type: \"Custom\",\n      message: `[Auto-Reply] ${$('Webhook From Scalify').first().json.body.Message}`,\n      contactId : $('Loop Over Contact').first().json.id,\n      conversationProviderId: $('Set fields').first().json.conversationProviderId\n    }\n  });\n} else if (data['Type Message'] === \"photo\") {\n  output.push({\n    json: {\n      type: \"Custom\",\n      message: \"[Auto-Reply]\",\n      contactId : $('Loop Over Contact').first().json.id,\n      attachments: [ $('Webhook From Scalify').first().json.body['Image Message'][0] ],\n      conversationProviderId: $('Set fields').first().json.conversationProviderId\n    }\n  });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6580,
+        2060
+      ],
+      "id": "c09c8d88-2800-422a-af74-f1a8c9aa4448",
+      "name": "Code Condition Data Message",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Code Condition Data Message').first().json.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6860,
+        2060
+      ],
+      "id": "a613b531-2354-431f-96f2-257bf38d3a0c",
+      "name": "Send Message Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"replyToken\": \"{{$('Set Line Each Event').first().json.replyToken}}\",\n  \"messages\": [\n    {\n      \"type\": \"flex\",\n      \"altText\": \"Hello, customer\",\n\"header\": {\n    \"type\": \"box\",\n    \"layout\": \"vertical\",\n    \"contents\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Hello, customer\"\n      }\n    ]\n  },\n      \"contents\": {\n        \"type\": \"bubble\",\n        \"body\": {\n          \"type\": \"box\",\n          \"layout\": \"horizontal\",\n          \"contents\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"This is form User Profile.\",\n              \"wrap\": true\n            }\n          ]\n        },\n        \"footer\": {\n          \"type\": \"box\",\n          \"layout\": \"horizontal\",\n          \"contents\": [\n            {\n              \"type\": \"button\",\n              \"style\": \"primary\",\n              \"height\": \"sm\",\n              \"action\": {\n                \"type\": \"uri\",\n                \"label\": \"User Profile\",\n                \"uri\": \"https://link.scalifytech.com/widget/form/7nKMZ6UlDkuJ6ZsvWiZz?line_id={{$('Set Line Each Event').first().json.source.userId}}\"\n              }\n            }\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8980,
+        -3260
+      ],
+      "id": "03d123a4-252f-4100-958b-17c9f6b076f1",
+      "name": "Line Reply Register Message",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "V7TJOZD1YniAjfp8",
+          "name": "Line Auth Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/conversations/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "Custom"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Scalify Get Contact By Line Id - 1').first().json.contacts[0].id }}"
+            },
+            {
+              "name": "message",
+              "value": "[Auto-Reply] Sent update profile message"
+            },
+            {
+              "name": "conversationProviderId",
+              "value": "={{ $('Set fields').first().json.conversationProviderId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        9180,
+        -3260
+      ],
+      "id": "af1ac343-ebf3-4bb6-882a-98edc844abac",
+      "name": "Add Register Message Scalify",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "WxYgvfVzqt08CxJ9",
+          "name": "Scalify Auth Header For Line Messaging"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6b31c179-01d5-492b-afe3-0d6b1580134c",
+              "leftValue": "={{ $('Webhook From Scalify').first().json.body.message }}",
+              "rightValue": "[Auto-Reply]",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3940,
+        680
+      ],
+      "id": "14f2c23b-8610-4687-bd54-156e9e69dba9",
+      "name": "Is Not Reply Message From Scalify"
+    }
+  ],
+  "connections": {
+    "Webhook From Scalify": {
+      "main": [
+        [
+          {
+            "node": "Set Public Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set fields": {
+      "main": [
+        [
+          {
+            "node": "Scalify Location Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading": {
+      "main": [
+        [
+          {
+            "node": "message type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Condition Webhook From Scalify": {
+      "main": [
+        [
+          {
+            "node": "Scalify Get Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Line : Message Loading1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Get Contact By Line Id - 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set text Object Baordcast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Contact": {
+      "main": [
+        [
+          {
+            "node": "Send Message Line suscess",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Value Undefined": {
+      "main": [
+        [
+          {
+            "node": "Delete Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Update": {
+      "main": [
+        [
+          {
+            "node": "Update Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "message type": {
+      "main": [
+        [
+          {
+            "node": "Translate Language Scalify to Line",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Line Push Image Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversation by Contract": {
+      "main": [
+        [
+          {
+            "node": "Condition Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Condition Type": {
+      "main": [
+        [
+          {
+            "node": "Scalify Create Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image From Line",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get Image From Line": {
+      "main": [
+        [
+          {
+            "node": "Rename image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send image to Scalify": {
+      "main": [
+        [
+          {
+            "node": "Get Delivered Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook From Line": {
+      "main": [
+        [
+          {
+            "node": "Set Source Line",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Line Signature": {
+      "main": [
+        [
+          {
+            "node": "Line Is Valid Signature?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Public Key": {
+      "main": [
+        [
+          {
+            "node": "Verify Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Signature": {
+      "main": [
+        [
+          {
+            "node": "Scalify Is Valid Signature?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Is Valid Signature?": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Set Line Access Token - 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Is Valid Signature?": {
+      "main": [
+        [
+          {
+            "node": "Set Source Scalify",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Source Scalify": {
+      "main": [
+        [
+          {
+            "node": "Set fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Source Line": {
+      "main": [
+        [
+          {
+            "node": "Set fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Source": {
+      "main": [
+        [
+          {
+            "node": "Extract Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Not Reply Message From Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Location Access Token": {
+      "main": [
+        [
+          {
+            "node": "Scalify Get Custom Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Scalify Get Custom Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Access Token - 2": {
+      "main": [
+        [
+          {
+            "node": "Scalify Update Line Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Verify Access Token": {
+      "main": [
+        [
+          {
+            "node": "Switch Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Line Access Token - 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Line Events": {
+      "main": [
+        [
+          {
+            "node": "Loop Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Line Events": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Set Line Each Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Line Each Event": {
+      "main": [
+        [
+          {
+            "node": "Is Line Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line User Profile": {
+      "main": [
+        [
+          {
+            "node": "Scalify Get Contact By Line Id - 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid Contact Id": {
+      "main": [
+        [
+          {
+            "node": "Switch Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Create Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Create Contact": {
+      "main": [
+        [
+          {
+            "node": "Scalify Create Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Create Conversation": {
+      "main": [
+        [
+          {
+            "node": "Switch Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Event Type": {
+      "main": [
+        [
+          {
+            "node": "Get Conversation by Contract",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Update Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Update Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Message Status To Read": {
+      "main": [
+        [
+          {
+            "node": "Loop Delivered Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Custom Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Custom Values": {
+      "main": [
+        [
+          {
+            "node": "Split Custom Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Line Custom Fields Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Line Credentials": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Line Custom Fields Data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Update Line Access Token": {
+      "main": [
+        [
+          {
+            "node": "Set Line Access Token - 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Line Access Token - 1": {
+      "main": [
+        [
+          {
+            "node": "Line Verify Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Line Access Token - 2": {
+      "main": [
+        [
+          {
+            "node": "Set Line Access Token - 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Line Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Update Contact": {
+      "main": [
+        [
+          {
+            "node": "Loop Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Contact": {
+      "main": [
+        [
+          {
+            "node": "Split Contact Custom Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter Line Custom Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Custom Values": {
+      "main": [
+        [
+          {
+            "node": "Filter Line Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Contact Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Set Line Custom Field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Push Image Message": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Contact By Line Id - 2": {
+      "main": [
+        [
+          {
+            "node": "Check Value Undefined",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Contact By Line Id - 1": {
+      "main": [
+        [
+          {
+            "node": "Is Valid Contact Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Message To Scalify": {
+      "main": [
+        [
+          {
+            "node": "Get Delivered Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Not Unfollow": {
+      "main": [
+        [
+          {
+            "node": "Line User Profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Get Contact By Line Id - 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message Line suscess": {
+      "main": [
+        [
+          {
+            "node": "Add Updated Profile Message To Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Push Register Link Message": {
+      "main": [
+        [
+          {
+            "node": "Add Register Message To Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to scalify": {
+      "main": [
+        [
+          {
+            "node": "Get image in scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get image in scalify": {
+      "main": [
+        [
+          {
+            "node": "Send image to Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename image": {
+      "main": [
+        [
+          {
+            "node": "Upload to scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create Line Signature",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Line Access Token - 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Contact": {
+      "main": [
+        [
+          {
+            "node": "Wait Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Message": {
+      "main": [
+        [
+          {
+            "node": "Split Out Pending Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Pending Message": {
+      "main": [
+        [
+          {
+            "node": "Loop Pending Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Pending Message": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Update Message Status To Delivered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Message Status To Delivered": {
+      "main": [
+        [
+          {
+            "node": "Loop Pending Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Delivered Message": {
+      "main": [
+        [
+          {
+            "node": "Split Out Delivered Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Delivered Message": {
+      "main": [
+        [
+          {
+            "node": "Filter Delivered Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Delivered Message": {
+      "main": [
+        [
+          {
+            "node": "Loop Delivered Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Delivered Message": {
+      "main": [
+        [
+          {
+            "node": "Loop Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Message Status To Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Pending Message": {
+      "main": [
+        [
+          {
+            "node": "Filter Pending Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading1": {
+      "main": [
+        [
+          {
+            "node": "Line Push Register Link Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading2": {
+      "main": [
+        [
+          {
+            "node": "Line Reply Register Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Message": {
+      "main": [
+        [
+          {
+            "node": "Translate Language Line to Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Line : Message Loading2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Line Group": {
+      "main": [
+        [
+          {
+            "node": "Is Not Unfollow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Not Leave",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Translate Language Scalify to Line",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Text": {
+      "main": [
+        [
+          {
+            "node": "Check Group Mention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Language Scalify to Line": {
+      "main": [
+        [
+          {
+            "node": "Clean Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Translate Language Line to Scalify",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Language Line to Scalify": {
+      "main": [
+        [
+          {
+            "node": "Clean Text Sclify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Text Sclify": {
+      "main": [
+        [
+          {
+            "node": "Push Message To Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Not Leave": {
+      "main": [
+        [
+          {
+            "node": "Line Group Profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Get Contact By Line Id [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Group Profile": {
+      "main": [
+        [
+          {
+            "node": "Scalify Get Contact By Line Id [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Create Contact [Group]": {
+      "main": [
+        [
+          {
+            "node": "Scalify Create Conversation [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Get Contact By Line Id [Group]": {
+      "main": [
+        [
+          {
+            "node": "Is Valid Contact Id [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Create Conversation [Group]": {
+      "main": [
+        [
+          {
+            "node": "Switch Event Type [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversation by Contract [Group]": {
+      "main": [
+        [
+          {
+            "node": "Condition Type [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Message To Scalify [Group]": {
+      "main": [
+        [
+          {
+            "node": "Get Delivered Message [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Delivered Message [Group]": {
+      "main": [
+        [
+          {
+            "node": "Split Out Delivered Message [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Delivered Message [Group]": {
+      "main": [
+        [
+          {
+            "node": "Filter Delivered Message [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Delivered Message [Group]": {
+      "main": [
+        [
+          {
+            "node": "Loop Delivered Message [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Delivered Message [Group]": {
+      "main": [
+        [
+          {
+            "node": "Loop Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Message Status To Read [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Message Status To Read [Group]": {
+      "main": [
+        [
+          {
+            "node": "Loop Delivered Message [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image From Line [Group]": {
+      "main": [
+        [
+          {
+            "node": "Rename image [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename image [Group]": {
+      "main": [
+        [
+          {
+            "node": "Upload to scalify [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to scalify [Group]": {
+      "main": [
+        [
+          {
+            "node": "Get image in scalify [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get image in scalify [Group]": {
+      "main": [
+        [
+          {
+            "node": "Send image to Scalify [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send image to Scalify [Group]": {
+      "main": [
+        [
+          {
+            "node": "Get Delivered Message [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Condition Type [Group]": {
+      "main": [
+        [
+          {
+            "node": "Scalify Create Conversation [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Push Message To Scalify [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image From Line [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Group User Profile": {
+      "main": [
+        [
+          {
+            "node": "Get Conversation by Contract [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Event Type [Group]": {
+      "main": [
+        [
+          {
+            "node": "Line Group User Profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Update Contact [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Update Contact [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalify Update Contact [Group]": {
+      "main": [
+        [
+          {
+            "node": "Loop Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Line Custom Field": {
+      "main": [
+        [
+          {
+            "node": "Is Group Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Group Chat": {
+      "main": [
+        [
+          {
+            "node": "Line : Message Loading",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "message type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid Contact Id [Group]": {
+      "main": [
+        [
+          {
+            "node": "Switch Event Type [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scalify Create Contact [Group]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Push Text Message": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Group Mention": {
+      "main": [
+        [
+          {
+            "node": "Line Push Text Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set text Object Baordcast": {
+      "main": [
+        [
+          {
+            "node": "Send Broadcast Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Broadcast Message": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Line Id From Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Line Id From Scalify": {
+      "main": [
+        [
+          {
+            "node": "Split Out Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Contact": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Conversation By Contact Line Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversation By Contact Line Id": {
+      "main": [
+        [
+          {
+            "node": "Code Condition Data Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Condition Data Message": {
+      "main": [
+        [
+          {
+            "node": "Send Message Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message Scalify": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Reply Register Message": {
+      "main": [
+        [
+          {
+            "node": "Add Register Message Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Register Message Scalify": {
+      "main": [
+        [
+          {
+            "node": "Loop Line Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Not Reply Message From Scalify": {
+      "main": [
+        [
+          {
+            "node": "Condition Webhook From Scalify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Bangkok",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "39d5292c-b8e3-45eb-ac7b-f6006718a288",
+  "triggerCount": 2,
+  "tags": [
+    {
+      "createdAt": "2025-04-02T12:05:27.901Z",
+      "updatedAt": "2025-04-02T12:05:27.901Z",
+      "id": "XCMgNVG3Bb8NnshP",
+      "name": "Line"
+    }
+  ]
+}
