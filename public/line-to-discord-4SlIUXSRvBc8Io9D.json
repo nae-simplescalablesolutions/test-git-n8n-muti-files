@@ -1,0 +1,1127 @@
+{
+  "createdAt": "2025-03-10T14:30:21.473Z",
+  "updatedAt": "2025-04-09T06:10:03.266Z",
+  "id": "4SlIUXSRvBc8Io9D",
+  "name": "Line to Discord",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+        "options": {}
+      },
+      "id": "71f61f40-c42b-42ea-9037-9f487baa3d0c",
+      "name": "Webhook from Line Message",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -500,
+        -180
+      ],
+      "webhookId": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b63773bb-f010-4018-8142-240c9aaa4570",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Webhook from Line Message').item.json.body.events[0].type }}",
+              "rightValue": "message"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "985b7440-feca-41e0-ba9f-1547d88c86a1",
+      "name": "Is Message",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -220,
+        -180
+      ],
+      "typeVersion": 2.2,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $('getUserLine').item.json.line_uid }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "a086bf1b-c821-4f6d-bb67-b0ac4b57f037",
+      "name": "Line : Message Loading",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        220,
+        340
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        340
+      ],
+      "id": "9d2595cf-7bb4-492b-a1bd-417b2e9430d0",
+      "name": "Wait",
+      "webhookId": "f48b4841-8254-4249-9bdb-600a2c1c1246"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://discord.com/api/webhooks/{{ $json.discord_ch_id }}/VtlLhIz0qzjsVyEU5sYJkmhpQyj1JVG1-XHoDWoU7Zf6alh1DPh9OG4U3cDtXuNDCFWn",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"username\": \"{{ $('GET lineUserProfile').item.json.displayName }}\",\n  \"avatar_url\": \"{{$('GET lineUserProfile').item.json.pictureUrl}}\",\n  \"content\": \"This is a message : {{ $('Webhook from Line Message').item.json.body.events[0].message.text }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        -1080
+      ],
+      "id": "ed9b9742-016a-40d1-8aaf-738517e0bc11",
+      "name": "POST Discord push message",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        0
+      ],
+      "id": "644cce6f-6503-4dfd-a3d3-61a80c20058b",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "guildId": {
+          "__rl": true,
+          "value": "1346277321094725632",
+          "mode": "list",
+          "cachedResultName": "nae's server",
+          "cachedResultUrl": "https://discord.com/channels/1346277321094725632"
+        },
+        "name": "={{ $('GET lineUserProfile').item.json.displayName }}",
+        "options": {
+          "categoryId": {
+            "__rl": true,
+            "value": "1348974408634728469",
+            "mode": "list",
+            "cachedResultName": "Line OA",
+            "cachedResultUrl": "https://discord.com/channels/1346277321094725632/1348974408634728469"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        760,
+        -200
+      ],
+      "id": "bd5e17f0-8ef7-4cec-8fbe-9a134eb67320",
+      "name": "createChannel",
+      "webhookId": "fdc402bb-fad2-4d82-990e-56b491615bb3",
+      "executeOnce": true,
+      "credentials": {
+        "discordBotApi": {
+          "id": "ulS0Jh1pl5rOo47c",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346277321094725632",
+          "mode": "list",
+          "cachedResultName": "nae's server",
+          "cachedResultUrl": "https://discord.com/channels/1346277321094725632"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $json.discord_ch_id }}",
+          "mode": "id"
+        },
+        "content": "={{ $('GET lineUserProfile').item.json.displayName }} : {{ $('Webhook from Line Message').item.json.body.events[0].message.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        -340
+      ],
+      "id": "24f10d56-9d0c-4570-97bd-9368843a18ad",
+      "name": "messageToDiscord",
+      "webhookId": "c488f90c-2eb8-403a-9ae3-440477b6fe33",
+      "credentials": {
+        "discordBotApi": {
+          "id": "ulS0Jh1pl5rOo47c",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.line.me/v2/bot/profile/{{ $('Webhook from Line Message').item.json.body.events[0].source.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -20,
+        -320
+      ],
+      "id": "34fbc775-54b0-4495-9650-5fd57d5da4a7",
+      "name": "GET lineUserProfile",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-discord-trigger.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -920,
+        500
+      ],
+      "id": "817dd1e6-bd7f-43f5-b28e-0766b5d51e65",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotTriggerApi": {
+          "id": "HaNQ0iDlpQfwH74g",
+          "name": "Discord Bot Trigger account 3"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+        "options": {}
+      },
+      "id": "6632b925-5bf8-4823-be5c-01802a67a6f4",
+      "name": "Webhook from Line Message1",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -500,
+        -1260
+      ],
+      "webhookId": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+      "typeVersion": 2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b63773bb-f010-4018-8142-240c9aaa4570",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Webhook from Line Message1').item.json.body.events[0].type }}",
+              "rightValue": "message"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7bae38f6-246b-4de1-81a1-ff5ccec005b9",
+      "name": "Is Message1",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        80,
+        -1260
+      ],
+      "typeVersion": 2.2,
+      "alwaysOutputData": false,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $('Webhook from Line Message1').item.json.body.events[0].source.userId }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "0a07f43c-bd88-46e9-bbd4-2d5f921aabe2",
+      "name": "Line : Message Loading1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -300,
+        -1260
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        -1260
+      ],
+      "id": "da3a1b5c-7c20-4d64-9d32-b40075bded90",
+      "name": "Wait1",
+      "webhookId": "f48b4841-8254-4249-9bdb-600a2c1c1246",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ee87854a-afb0-4693-827a-23bbd3602613",
+              "leftValue": "={{ $('getDiscordChannals1').all().map(item => item.json.name) }}",
+              "rightValue": "={{ $('GET lineUserProfile1').item.json.displayName }}",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        -1400
+      ],
+      "id": "873e2a40-403c-4a98-aca6-e6df0469b21b",
+      "name": "If1",
+      "alwaysOutputData": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "guildId": {
+          "__rl": true,
+          "value": "1346277321094725632",
+          "mode": "list",
+          "cachedResultName": "nae's server",
+          "cachedResultUrl": "https://discord.com/channels/1346277321094725632"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        460,
+        -1400
+      ],
+      "id": "28518302-c8b0-4267-a03f-28b30151d90e",
+      "name": "getDiscordChannals1",
+      "webhookId": "b9c666c6-fae1-4240-ac14-5bd7ff12709c",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "discordBotApi": {
+          "id": "ulS0Jh1pl5rOo47c",
+          "name": "Discord Bot account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        280,
+        -1080
+      ],
+      "id": "ef50dd09-d675-4a5b-9883-507b5ca75208",
+      "name": "No Operation, do nothing1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "guildId": {
+          "__rl": true,
+          "value": "1346277321094725632",
+          "mode": "list",
+          "cachedResultName": "nae's server",
+          "cachedResultUrl": "https://discord.com/channels/1346277321094725632"
+        },
+        "name": "={{ $('GET lineUserProfile1').item.json.displayName }}",
+        "options": {
+          "categoryId": {
+            "__rl": true,
+            "value": "1348974408634728469",
+            "mode": "list",
+            "cachedResultName": "Line OA",
+            "cachedResultUrl": "https://discord.com/channels/1346277321094725632/1348974408634728469"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        900,
+        -1220
+      ],
+      "id": "c18e000b-d79b-4b74-902e-8bbd65c6b882",
+      "name": "createChannel1",
+      "webhookId": "fdc402bb-fad2-4d82-990e-56b491615bb3",
+      "executeOnce": true,
+      "credentials": {
+        "discordBotApi": {
+          "id": "ulS0Jh1pl5rOo47c",
+          "name": "Discord Bot account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nreturn $input.all().filter((item) => item.json.name === $('GET lineUserProfile1').item.json.displayName && item.json.parent_id);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        -1520
+      ],
+      "id": "e57f9f2d-f5a1-4239-9cbb-8aa17e9a9ca9",
+      "name": "Code1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1346277321094725632",
+          "mode": "list",
+          "cachedResultName": "nae's server",
+          "cachedResultUrl": "https://discord.com/channels/1346277321094725632"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $json.id || $json.discord_ch_id }}",
+          "mode": "id"
+        },
+        "content": "=Hello from {{ $('GET lineUserProfile1').item.json.displayName }}!\\n\nThis is a message : {{ $('Webhook from Line Message1').item.json.body.events[0].message.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        -1520
+      ],
+      "id": "be31e701-27be-4706-9835-79a70df7f73e",
+      "name": "messageToDiscord1",
+      "webhookId": "c488f90c-2eb8-403a-9ae3-440477b6fe33",
+      "credentials": {
+        "discordBotApi": {
+          "id": "ulS0Jh1pl5rOo47c",
+          "name": "Discord Bot account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://api.line.me/v2/bot/profile/{{ $('Webhook from Line Message1').item.json.body.events[0].source.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        -1400
+      ],
+      "id": "ebaf127e-92e6-4852-b236-b3db45857bd3",
+      "name": "GET lineUserProfile1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "tableId": "user",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "line_uid",
+              "fieldValue": "={{ $('GET lineUserProfile1').item.json.userId }}"
+            },
+            {
+              "fieldId": "discord_ch_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "discord_ch_name",
+              "fieldValue": "={{ $json.name}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        -1220
+      ],
+      "id": "33653bda-741f-46ea-b493-179846e1c2f7",
+      "name": "createUserRec1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3botM3i57UgLaMNY",
+          "name": "Supabase dev nae"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "tableId": "user",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "line_uid",
+              "fieldValue": "={{ $('GET lineUserProfile').item.json.userId }}"
+            },
+            {
+              "fieldId": "discord_ch_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "discord_ch_name",
+              "fieldValue": "={{ $json.name}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -200
+      ],
+      "id": "4eff2c81-3896-43e6-b78c-afa923125f69",
+      "name": "createUser",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3botM3i57UgLaMNY",
+          "name": "Supabase dev nae"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        220,
+        620
+      ],
+      "id": "365d0fbe-5f3a-4f0f-be1a-adaa0dcde55b",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $('getUserLine').item.json.line_uid }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"This is your message from discord: {{ $('WebhookDiscord').item.json.body.content }}\",\n      \"sender\": {\n        \"name\": \"{{ $('WebhookDiscord').item.json.body.authorTag }}\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        340
+      ],
+      "id": "428abf0b-e363-4b4a-a12d-c1bf8ce77683",
+      "name": "Line Push",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "discord_ch_id",
+              "keyValue": "={{ $json.body.channelId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        500
+      ],
+      "id": "2c4bca9a-719f-45d0-ab42-02ec9eee3fd8",
+      "name": "getUserLine",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "3botM3i57UgLaMNY",
+          "name": "Supabase dev nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "line_uid",
+              "keyValue": "={{ $('GET lineUserProfile').item.json.userId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -320
+      ],
+      "id": "1a0ded34-b26a-423b-846c-e90bb39e6daf",
+      "name": "getUserDiscord",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "3botM3i57UgLaMNY",
+          "name": "Supabase dev nae"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ee87854a-afb0-4693-827a-23bbd3602613",
+              "leftValue": "={{ $('getUserLine').item.json.line_uid }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -60,
+        500
+      ],
+      "id": "addf894c-599c-49c2-a02a-bd8b7c315a04",
+      "name": "ifUserLine",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ee87854a-afb0-4693-827a-23bbd3602613",
+              "leftValue": "={{ $('getUserDiscord').item.json.line_uid }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -320
+      ],
+      "id": "44593f78-f477-47eb-83dd-b68f5c79653e",
+      "name": "ifUserDiscord",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -920,
+        720
+      ],
+      "id": "6790fc27-2da7-4a21-b974-2193dd0fafd5",
+      "name": "When chat message received",
+      "webhookId": "f0443ce6-f869-4226-81e8-4ea38fc87e3b",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "5b6110f0-e10d-4cdb-b8f1-4e5d774ae134",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -500,
+        500
+      ],
+      "id": "a9f4fd0e-950d-48ed-922b-229a38c4b838",
+      "name": "WebhookDiscord",
+      "webhookId": "5b6110f0-e10d-4cdb-b8f1-4e5d774ae134"
+    }
+  ],
+  "connections": {
+    "Webhook from Line Message": {
+      "main": [
+        [
+          {
+            "node": "Is Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Message": {
+      "main": [
+        [
+          {
+            "node": "GET lineUserProfile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Line Push",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        []
+      ]
+    },
+    "createChannel": {
+      "main": [
+        [
+          {
+            "node": "createUser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "messageToDiscord": {
+      "main": [
+        []
+      ]
+    },
+    "GET lineUserProfile": {
+      "main": [
+        [
+          {
+            "node": "getUserDiscord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST Discord push message": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook from Line Message1": {
+      "main": [
+        [
+          {
+            "node": "Line : Message Loading1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Message1": {
+      "main": [
+        [
+          {
+            "node": "GET lineUserProfile1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Is Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "createChannel1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getDiscordChannals1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "createChannel1": {
+      "main": [
+        [
+          {
+            "node": "createUserRec1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "messageToDiscord1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET lineUserProfile1": {
+      "main": [
+        [
+          {
+            "node": "getDiscordChannals1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "createUserRec1": {
+      "main": [
+        [
+          {
+            "node": "messageToDiscord1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "createUser": {
+      "main": [
+        [
+          {
+            "node": "messageToDiscord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "getUserLine": {
+      "main": [
+        [
+          {
+            "node": "ifUserLine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getUserDiscord": {
+      "main": [
+        [
+          {
+            "node": "ifUserDiscord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ifUserLine": {
+      "main": [
+        [
+          {
+            "node": "Line : Message Loading",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ifUserDiscord": {
+      "main": [
+        [
+          {
+            "node": "messageToDiscord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "createChannel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "WebhookDiscord": {
+      "main": [
+        [
+          {
+            "node": "getUserLine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When chat message received": [
+      {
+        "json": {
+          "channelId": "1349020092645511218",
+          "name": "nae",
+          "content": "hello world"
+        }
+      }
+    ]
+  },
+  "versionId": "d1162561-6054-41ee-9586-cae4cfa935ad",
+  "triggerCount": 2,
+  "tags": []
+}
