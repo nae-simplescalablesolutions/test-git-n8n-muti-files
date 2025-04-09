@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-13T05:13:43.465Z",
-  "updatedAt": "2025-04-09T06:08:54.340Z",
+  "updatedAt": "2025-04-09T06:11:25.968Z",
   "id": "YiEQR4M7JfHUbF2f",
   "name": "Line to GHL",
   "active": true,
@@ -829,7 +829,7 @@
         "type": "SHA256",
         "value": "={{ JSON.stringify($json.body) }}",
         "dataPropertyName": "signature",
-        "secret": "=",
+        "secret": "=e9d6f7847646a02ff0db2ed1d2eef7ea",
         "encoding": "base64"
       },
       "type": "n8n-nodes-base.crypto",
@@ -1783,7 +1783,7 @@
       }
     ]
   },
-  "versionId": "f0d3db42-f8ea-4ae5-82fc-00f5a9d0adaf",
+  "versionId": "af3fa6c4-652a-4d28-bfe8-b26124f97d31",
   "triggerCount": 2,
   "tags": []
 }
