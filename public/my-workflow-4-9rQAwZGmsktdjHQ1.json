@@ -1,0 +1,1561 @@
+{
+  "createdAt": "2025-03-10T07:40:16.587Z",
+  "updatedAt": "2025-03-11T14:53:49.051Z",
+  "id": "9rQAwZGmsktdjHQ1",
+  "name": "My workflow 4",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $json.body.events[0].source.userId }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -660,
+        -480
+      ],
+      "id": "d3430d3c-4073-4695-8281-17907c9eb16c",
+      "name": "Line Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fCGmv3McGhU7Li8V",
+          "name": "Header Auth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://discord.com/api/channels/1348612010622849064/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"content\" :\"This is message from line : {{ $('Webhook from line').item.json.body.events[0].message.text }}\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        -1100
+      ],
+      "id": "dc6f116b-0f41-45a1-9af8-bd58cf55666e",
+      "name": "Discord Respone",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ibdObppLACuBM9Pq",
+          "name": "Auth Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $json.user_id }}\",\n  \"messages\": [\n      \"text\": \"This is your message from discord : {{ $('If message from discord').item.json.text }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        -800
+      ],
+      "id": "256f54de-7c64-46d8-ad1e-b2eec6065003",
+      "name": "Line Respone",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fCGmv3McGhU7Li8V",
+          "name": "Header Auth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "71c9418a-e444-4565-b1d6-5b92a0b59460",
+              "name": "toSign",
+              "value": "={{ $json.headers['x-signature-timestamp'] }}{{ JSON.stringify($json.body) }}",
+              "type": "string"
+            },
+            {
+              "id": "75cfc845-01ce-48bc-9c25-d4766b9d2396",
+              "name": "signature",
+              "value": "={{ $json.headers[\"x-signature-ed25519\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "f084d3dd-dd44-4a63-b095-a638403344a3",
+              "name": "publicKey",
+              "value": "3b132a9fa065daa56b6a641dcf3f5948f9633b6e63e974294dce71e5a31ed1ce",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -680,
+        -700
+      ],
+      "id": "111b9f2f-9cc1-48d9-ae12-2d1028146f88",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "data.type",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4016fa5e-314c-4538-b163-2ce3dd34cca8",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -540,
+        -700
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f704162e-379c-4ea9-a053-f4c4aa56337d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -840,
+        400
+      ],
+      "id": "5bf89196-c7bd-4925-80c5-fbdf7fcb565c",
+      "name": "Webhook from line",
+      "webhookId": "f704162e-379c-4ea9-a053-f4c4aa56337d"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\"text\":\"{{ $json.content }}\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -200,
+        -720
+      ],
+      "id": "617201c5-449d-44d9-8ac7-1ff475c2310a",
+      "name": "Set last message in discord",
+      "executeOnce": true,
+      "retryOnFail": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "https://discord.com/api/channels/1348612010622849064/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        -1100
+      ],
+      "id": "84f9af2a-4793-429d-bb5d-fae081265459",
+      "name": "Get messages from discord",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ibdObppLACuBM9Pq",
+          "name": "Auth Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "26da93a5-89f6-4a93-bb59-c94ea14b9a4c",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -860,
+        -700
+      ],
+      "id": "8a840562-66f4-4f77-8d92-0f962e92ebd1",
+      "name": "Webhook from discord",
+      "webhookId": "26da93a5-89f6-4a93-bb59-c94ea14b9a4c",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ce240e9c-70b2-4dfd-85d0-82feeb45c8c9",
+              "leftValue": "={{ $('Webhook from line').item.json.body.events[0].message.type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        -500
+      ],
+      "id": "9e934a60-43e8-4261-a881-85d92165b475",
+      "name": "If message from line"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "490d7358-488c-49f3-b8f3-d6a6f57ecf77",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        40,
+        -720
+      ],
+      "id": "6ed92090-2191-4689-8076-a0a37483486c",
+      "name": "If message from discord"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        300,
+        -640
+      ],
+      "id": "abbf3cd5-ec44-4f07-a4b2-42d9f8dbf653",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "50b89ba0-2a55-4dd4-a17c-825e3e8bf400",
+              "leftValue": "={{ $('Get User').item.json.line_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        340
+      ],
+      "id": "25cb63dd-3401-4cd2-a36e-d0597abb2523",
+      "name": "If dont have data in tableLine"
+    },
+    {
+      "parameters": {
+        "tableId": "TestDataLine",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_line_id",
+              "fieldValue": "={{ $('Webhook from line').item.json.body.events[0].source.userId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        420,
+        220
+      ],
+      "id": "ace0c679-1177-492e-86f4-fcf8339aaed2",
+      "name": "Crete new userId in line table",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "TestDataDiscord"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -1100
+      ],
+      "id": "6be0334f-d435-4d45-b70a-4195137266b8",
+      "name": "Find user_id in discord table",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dcfee3b0-fabd-438b-a173-c13d7e9f38f2",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        -1120
+      ],
+      "id": "5e4f387f-d73a-4f66-b9fa-3a00aaf41690",
+      "name": "If dont have data in tableDiscord"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "TestDataDiscord",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -1120
+      ],
+      "id": "50ca3179-32fb-4c2e-b844-63de84d185c6",
+      "name": "Crete new userId in discord table",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1348563666961825812",
+          "mode": "list",
+          "cachedResultName": "test webhook",
+          "cachedResultUrl": "https://discord.com/channels/1348563666961825812"
+        },
+        "sendTo": "user",
+        "userId": {
+          "__rl": true,
+          "value": "1347413333959114752",
+          "mode": "id"
+        },
+        "content": "=this is meesage from Line : {{ $('Webhook from line').item.json.body.events[0].message.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        240
+      ],
+      "id": "22bc8410-a0b1-42d3-b11b-29acfa7b1b7b",
+      "name": "Send Message",
+      "webhookId": "4d98fa94-f30d-4888-a874-bd7794fb72aa",
+      "credentials": {
+        "discordBotApi": {
+          "id": "we3v4RzpJ82lqkpq",
+          "name": "Discord Bot account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "guildId": {
+          "__rl": true,
+          "value": "1348563666961825812",
+          "mode": "list",
+          "cachedResultName": "test webhook",
+          "cachedResultUrl": "https://discord.com/channels/1348563666961825812"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1348612010622849064",
+          "mode": "list",
+          "cachedResultName": "test-discord-8n8-bot",
+          "cachedResultUrl": "https://discord.com/channels/1348563666961825812/1348612010622849064"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        -720
+      ],
+      "id": "23a4c933-04c9-4b65-adc8-d46b2e6507d1",
+      "name": "Get Messages",
+      "webhookId": "066d811f-e97b-430f-9abe-4cbef78e422d",
+      "executeOnce": false,
+      "credentials": {
+        "discordBotApi": {
+          "id": "we3v4RzpJ82lqkpq",
+          "name": "Discord Bot account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "TestDataLine",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "7"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        300,
+        -800
+      ],
+      "id": "dda9434e-dfda-47de-89b3-cb6cd825eff8",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pattern": "every",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-discord-trigger.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        580
+      ],
+      "id": "29623f03-b6a9-44d2-83e7-dd30acb527cc",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotTriggerApi": {
+          "id": "vZfn8UG6emSuubiD",
+          "name": "Discord Bot Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"to\": \"{{ $json.user_id }}\",\n  \"messages\": [\n    {\n\"type\": \"text\",\n      \"text\": \"This is your message from discord: {{ $('If message from discord2').item.json.content }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1060,
+        600
+      ],
+      "id": "eda7c49b-faf1-409b-a386-92431d28a8b2",
+      "name": "Line Respone2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fCGmv3McGhU7Li8V",
+          "name": "Header Auth account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "490d7358-488c-49f3-b8f3-d6a6f57ecf77",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        -460
+      ],
+      "id": "b475ca44-3412-4031-b4b0-3cc2897dc21d",
+      "name": "If message from discord2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "TestDataLine",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "7"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -480
+      ],
+      "id": "20b6971c-8cd6-4141-bcf8-056264ca7d47",
+      "name": "Supabase2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "User",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "noppadon"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        580
+      ],
+      "id": "a33b7b1b-e711-4fda-a008-029600fa863f",
+      "name": "Create User",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "guildId": {
+          "__rl": true,
+          "value": "1348563666961825812",
+          "mode": "list",
+          "cachedResultName": "test webhook",
+          "cachedResultUrl": "https://discord.com/channels/1348563666961825812"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -840,
+        -500
+      ],
+      "id": "29889b74-b927-47a3-938b-279fc8c255b6",
+      "name": "Discord1",
+      "webhookId": "3ec4d328-5d0c-4d75-a8f1-0b31f497576e",
+      "credentials": {
+        "discordBotApi": {
+          "id": "we3v4RzpJ82lqkpq",
+          "name": "Discord Bot account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -440,
+        -500
+      ],
+      "id": "31c37a8b-85f0-4308-adcf-ec39e4055d71",
+      "name": "Wait",
+      "webhookId": "36ead30b-6983-4174-9861-e8045f3f8a17"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        -500
+      ],
+      "id": "6b55900c-6e87-4ff5-aa07-4b2adf843bd2",
+      "name": "Wait1",
+      "webhookId": "36ead30b-6983-4174-9861-e8045f3f8a17"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "User",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "name",
+              "keyValue": "noppadon"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        480
+      ],
+      "id": "64fad23a-7fcb-43a9-ab64-46f0e5405027",
+      "name": "Get User",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "noppadon",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "67519a63-0a38-401d-a46b-7a52849d2c43"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "User"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b2c07f18-5235-4f51-8421-34c35cb9d13c",
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Not have user"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -360,
+        480
+      ],
+      "id": "20037e8c-86ea-44fa-a89c-2d941800264e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook from line') }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "2414fb60-c475-41a5-a6a6-942ffffabbc8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Line message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "024a3d6a-191f-4694-beb8-93c3ed27c3bc",
+                    "leftValue": "={{ $('Discord Trigger') }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Discord message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -40,
+        460
+      ],
+      "id": "b0276f69-e209-4a9e-bccb-8e1a4c975616",
+      "name": "check message",
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "User",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get User').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "line_id",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        600,
+        220
+      ],
+      "id": "b170cd80-7a51-4bc5-ac7e-b641100ae50d",
+      "name": "Update User line_id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "TestDataDiscord",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_discord_id",
+              "fieldValue": "={{ $('Discord Trigger').item.json.authorId }}"
+            },
+            {
+              "fieldId": "channel_id",
+              "fieldValue": "={{ $('Discord Trigger').item.json.channelId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        420,
+        460
+      ],
+      "id": "1bdfdbff-0ce6-451b-8098-3bc58a119712",
+      "name": "Crete new userId in discord table2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "50b89ba0-2a55-4dd4-a17c-825e3e8bf400",
+              "leftValue": "={{ $('Get User').item.json.discord_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        580
+      ],
+      "id": "e9f1e5bf-a24a-40cf-b97a-4e673001cbc5",
+      "name": "If dont have data in tableDiscord2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "User",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get User').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "discord_id",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        620,
+        460
+      ],
+      "id": "5885e192-b607-48f9-8e3a-ee4dc29877d8",
+      "name": "Update User discord_id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "TestDataDiscord",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Get User').item.json.discord_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        240
+      ],
+      "id": "b4c9717b-f8a3-425c-a23a-28912e9a93a4",
+      "name": "Get Discord id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1348563666961825812",
+          "mode": "list",
+          "cachedResultName": "test webhook",
+          "cachedResultUrl": "https://discord.com/channels/1348563666961825812"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1348612010622849064",
+          "mode": "list",
+          "cachedResultName": "test-discord-8n8-bot",
+          "cachedResultUrl": "https://discord.com/channels/1348563666961825812/1348612010622849064"
+        },
+        "content": "=this is meesage from Line : {{ $('Webhook from line').item.json.body.events[0].message.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        420
+      ],
+      "id": "7eb82c54-67d9-4e3b-968d-e3d9f7082de4",
+      "name": "Send Message1",
+      "webhookId": "4d98fa94-f30d-4888-a874-bd7794fb72aa",
+      "credentials": {
+        "discordBotApi": {
+          "id": "we3v4RzpJ82lqkpq",
+          "name": "Discord Bot account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b9257a70-dd1d-4795-bca9-77b4b5d3453b",
+              "leftValue": "={{ $('Get User').item.json.discord_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        360
+      ],
+      "id": "1b44493b-8065-4ac8-973c-ba9521741145",
+      "name": "If have discord_id"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "TestDataLine",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        800,
+        600
+      ],
+      "id": "10ad9908-53c2-413f-bc0f-4eedbbfa7039",
+      "name": "Get Line Id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REnTzNG9hxZE8t6n",
+          "name": "Supabase account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Line Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Respone": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook from line": {
+      "main": [
+        [
+          {
+            "node": "Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set last message in discord": {
+      "main": [
+        [
+          {
+            "node": "If message from discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get messages from discord": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook from discord": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If message from line": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "If message from discord": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Get Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If dont have data in tableLine": {
+      "main": [
+        [
+          {
+            "node": "Crete new userId in line table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If have discord_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crete new userId in line table": {
+      "main": [
+        [
+          {
+            "node": "Update User line_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find user_id in discord table": {
+      "main": [
+        [
+          {
+            "node": "If dont have data in tableDiscord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If dont have data in tableDiscord": {
+      "main": [
+        [
+          {
+            "node": "Crete new userId in discord table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Crete new userId in discord table": {
+      "main": [
+        []
+      ]
+    },
+    "Discord Respone": {
+      "main": [
+        []
+      ]
+    },
+    "Get Messages": {
+      "main": [
+        [
+          {
+            "node": "Set last message in discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Line Respone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If message from discord2": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Supabase2": {
+      "main": [
+        []
+      ]
+    },
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create User": {
+      "main": [
+        [
+          {
+            "node": "Get User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        []
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "If message from discord2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "check message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check message": {
+      "main": [
+        [
+          {
+            "node": "If dont have data in tableLine",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If dont have data in tableDiscord2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message": {
+      "main": [
+        []
+      ]
+    },
+    "Update User line_id": {
+      "main": [
+        [
+          {
+            "node": "If have discord_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If dont have data in tableDiscord2": {
+      "main": [
+        [
+          {
+            "node": "Crete new userId in discord table2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Line Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crete new userId in discord table2": {
+      "main": [
+        [
+          {
+            "node": "Update User discord_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update User discord_id": {
+      "main": [
+        [
+          {
+            "node": "Get Line Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Discord id": {
+      "main": [
+        [
+          {
+            "node": "Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If have discord_id": {
+      "main": [
+        [
+          {
+            "node": "Get Discord id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line Respone2": {
+      "main": [
+        []
+      ]
+    },
+    "Get Line Id": {
+      "main": [
+        [
+          {
+            "node": "Line Respone2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3e238e13-1358-4e87-a3e4-232431e13298",
+  "triggerCount": 2,
+  "tags": []
+}
