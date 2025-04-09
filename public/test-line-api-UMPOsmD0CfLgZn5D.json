@@ -1,0 +1,456 @@
+{
+  "createdAt": "2025-03-07T04:45:34.446Z",
+  "updatedAt": "2025-04-09T06:09:21.203Z",
+  "id": "UMPOsmD0CfLgZn5D",
+  "name": "Test-Line API",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+        "options": {}
+      },
+      "id": "7e8ed293-715d-4e69-8f64-bdb8c225ae98",
+      "name": "Webhook from Line Message",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        80,
+        180
+      ],
+      "webhookId": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Line Message API Reply\n\nReceived Message from user and reply with same text by using reply token  \n\nThere are many event types. So we need to determine if the type is message.",
+        "height": 480,
+        "width": 1260
+      },
+      "id": "a870b5ef-4d26-4e72-a22d-16f6608d9529",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Line Message API Send Message\n\nYou need to get the Line UID first.\nEvery user is differnt.\n\nIf you have the Line UID. Then you can push the message to the User.",
+        "height": 340,
+        "width": 720
+      },
+      "id": "da641852-d0ed-4cd3-bbb7-61e98163fd53",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        580
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $json.line_uid }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"This is test message\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "03f229a8-cdaf-40c3-8626-03f393cd5453",
+      "name": "Line : Push Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        520,
+        760
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "qFR3xybLRjUBNsjS",
+          "name": "Header Auth Line channel"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "52470ba8-75ab-494b-9613-3c7bcc673e05",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        60,
+        760
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b63773bb-f010-4018-8142-240c9aaa4570",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Webhook from Line Message').item.json.body.events[0].type }}",
+              "rightValue": "message"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d086b529-244d-4f91-8a34-1281becccaca",
+      "name": "Is Message",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        620,
+        180
+      ],
+      "typeVersion": 2.2,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6278f340-6287-4e89-b774-f6c584954d5b",
+              "name": "line_uid",
+              "type": "string",
+              "value": "Uc68552d1f9e4203a6b6bf31a891bec41"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ca15dac-9ba0-48c0-bb40-7e96e187dd52",
+      "name": "Config line_uid",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        280,
+        760
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Authorization\": \"Bearer iO2DEnvBTa3TWUfTb0K3trKkmJsja9kuDAkrRjx43mAkw4uboyVG6CcrXti9O7K30c4qUravgNaWn4faG060WFcV6728XfHB2aAyCcuigb6kumhCiCJExBYaQBTwaggUvNFRvdyBtBJYjtM8tYFR4gdB04t89/1O/w1cDnyilFU=\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"chatId\": \"{{ $json.body.events[0].source.type === \"group\" ? $('Webhook from Line Message').item.json.body.events[0].source.groupId : $('Webhook from Line Message').item.json.body.events[0].source.userId }}\",\n    \"loadingSeconds\": 60\n}",
+        "options": {}
+      },
+      "id": "3cce132d-6a5f-4fbf-b8b3-8146ac0bdd2b",
+      "name": "Line : Message Loading",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        280,
+        180
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c4913bf7-eed0-4812-9bb8-6580174e761a",
+              "leftValue": "={{ $('Webhook from Line Message').item.json.body.events[0].source.type }}",
+              "rightValue": "user",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        820,
+        40
+      ],
+      "id": "339128c3-1014-40a5-8d7a-498c4726fb66",
+      "name": "Is User",
+      "executeOnce": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c4913bf7-eed0-4812-9bb8-6580174e761a",
+              "leftValue": "={{ $('Webhook from Line Message').item.json.body.events[0].source.type }}",
+              "rightValue": "group",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        820,
+        280
+      ],
+      "id": "7b580dfb-6a67-42f8-b635-dd5257c56ffb",
+      "name": "Is group"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Authorization\": \"Bearer iO2DEnvBTa3TWUfTb0K3trKkmJsja9kuDAkrRjx43mAkw4uboyVG6CcrXti9O7K30c4qUravgNaWn4faG060WFcV6728XfHB2aAyCcuigb6kumhCiCJExBYaQBTwaggUvNFRvdyBtBJYjtM8tYFR4gdB04t89/1O/w1cDnyilFU=\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $('Webhook from Line Message').item.json.body.events[0].source.userId }}\",\n  \"replyToken\": \"{{ $('Webhook from Line Message').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"quoteToken\": \"{{ $('Webhook from Line Message').item.json.body.events[0].message.quoteToken }}\",\n      \"text\": \"This is your message : {{ $('Webhook from Line Message').item.json.body.events[0].message.text }}\",\n      \"sender\": {\n                      \"name\": \"Nae-admin\",\n                      \"iconUrl\": \"https://line.me/conyprof\"\n                  }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "53b768c0-e091-4fdc-8f7a-b1b48673e8f7",
+      "name": "Line : Reply with token (1:1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1020,
+        20
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Authorization\": \"Bearer iO2DEnvBTa3TWUfTb0K3trKkmJsja9kuDAkrRjx43mAkw4uboyVG6CcrXti9O7K30c4qUravgNaWn4faG060WFcV6728XfHB2aAyCcuigb6kumhCiCJExBYaQBTwaggUvNFRvdyBtBJYjtM8tYFR4gdB04t89/1O/w1cDnyilFU=\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $('Webhook from Line Message').item.json.body.events[0].source.groupId }}\",\n  \"replyToken\": \"{{ $('Webhook from Line Message').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"quoteToken\": \"{{ $('Webhook from Line Message').item.json.body.events[0].message.quoteToken }}\",\n      \"text\": \"This is your message : {{ $('Webhook from Line Message').item.json.body.events[0].message.text }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "5881ebf0-5b5e-456d-882d-6ebd6c495238",
+      "name": "Line : Reply with token (Group)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1020,
+        280
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        180
+      ],
+      "id": "b678238b-041e-4f62-b436-4179ba4b11ba",
+      "name": "Wait",
+      "webhookId": "f48b4841-8254-4249-9bdb-600a2c1c1246"
+    }
+  ],
+  "connections": {
+    "Webhook from Line Message": {
+      "main": [
+        [
+          {
+            "node": "Line : Message Loading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Config line_uid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Message": {
+      "main": [
+        [
+          {
+            "node": "Is User",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config line_uid": {
+      "main": [
+        [
+          {
+            "node": "Line : Push Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Message Loading": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is User": {
+      "main": [
+        [
+          {
+            "node": "Line : Reply with token (1:1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is group": {
+      "main": [
+        [
+          {
+            "node": "Line : Reply with token (Group)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Is Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Line : Reply with token (Group)": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook from Line Message": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-scalify-u18380.vm.elestio.app",
+            "x-real-ip": "147.92.149.170",
+            "x-forwarded-for": "147.92.149.170",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "443",
+            "connection": "close",
+            "content-length": "608",
+            "x-line-signature": "u6TI9ZekOgU9xAEEIiuAWheBx8jezKCwOkVA6HY0Qa4=",
+            "content-type": "application/json; charset=utf-8",
+            "user-agent": "LineBotWebhook/2.0"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "destination": "U0c42b3e13ec1ae8ea6f97d7fd9d4ca94",
+            "events": [
+              {
+                "type": "message",
+                "message": {
+                  "type": "text",
+                  "id": "555456185047449644",
+                  "quoteToken": "GS4TGwIpYb-0uGVRJPQtKJsIy7QLOFZ6tKk1Nl-DBk6jNx77Oz3wePjrtgGqCeAGyprybtBkkXR3nsN_6LZ_OvmPg-7UsOPXxQjgDnjrZ1ZiM8vNVgVCYJs9MakS4tNaKNuRzwY9lqdwAQ70SQQm7g",
+                  "text": "hello"
+                },
+                "webhookEventId": "01JR4H6VEBSG4431J351ZQK43J",
+                "deliveryContext": {
+                  "isRedelivery": false
+                },
+                "timestamp": 1743908990167,
+                "source": {
+                  "type": "group",
+                  "groupId": "C5d1a217bd2f1dc963842d1484b624faa",
+                  "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
+                },
+                "replyToken": "c60772713601467a9602739f1f782227",
+                "mode": "active"
+              }
+            ]
+          },
+          "webhookUrl": "https://n8n-scalify-u18380.vm.elestio.app/webhook/638c118e-1c98-4491-b6ff-14e2e75380b6",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "256335ff-eb47-43ff-9d78-8608675bb181",
+  "triggerCount": 1,
+  "tags": []
+}
