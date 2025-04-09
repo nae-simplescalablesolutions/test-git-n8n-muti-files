@@ -1,0 +1,341 @@
+{
+  "createdAt": "2025-04-02T11:37:31.769Z",
+  "updatedAt": "2025-04-09T07:55:01.014Z",
+  "id": "YAbCsmaTK7j23pG9",
+  "name": "Line Github Workflow",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $('Set Github Info').item.json['Github Username'] }}/{{ $('Set Github Info').item.json['Github Repo'] }}/git/refs/heads/{{ $('Set Github Info').item.json['Github Branch'] }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "id": "ca251bd2-02af-4393-ad6e-797eb9074589",
+      "name": "Get latest commit SHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        340,
+        -1320
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "XYM8LiYCuqzj8z5S",
+          "name": "Github Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $('Set Github Info').item.json['Github Username'] }}/{{ $('Set Github Info').item.json['Github Repo'] }}/git/commits/{{ $json.object.sha }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "id": "2b2805aa-86bb-4d61-b82f-12de04786f7f",
+      "name": "Get base tree SHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        560,
+        -1320
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "XYM8LiYCuqzj8z5S",
+          "name": "Github Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Set Github Info').first().json['Github Username'] }}/{{ $('Set Github Info').first().json['Github Repo'] }}/git/trees",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json, null, 2) }}",
+        "options": {}
+      },
+      "id": "26b3693d-523a-4e9c-b189-07dab46a5f34",
+      "name": "Create new tree",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -100,
+        -1080
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "XYM8LiYCuqzj8z5S",
+          "name": "Github Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.github.com/repos/{{ $('Set Github Info').first().json['Github Username'] }}/{{ $('Set Github Info').first().json['Github Repo'] }}/git/commits",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"{{ $('Set Github Info').first().json['Github Commit Update Message'] }}\",\n  \"tree\": \"{{ $json.sha }}\",\n  \"parents\": [\"{{ $('Get latest commit SHA').first().json.object.sha }}\"]\n}",
+        "options": {}
+      },
+      "id": "bcd5b10c-13a0-49ce-8513-bc2c7b581cc8",
+      "name": "Create commit",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        120,
+        -1080
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "XYM8LiYCuqzj8z5S",
+          "name": "Github Header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.github.com/repos/{{ $('Set Github Info').first().json['Github Username'] }}/{{ $('Set Github Info').first().json['Github Repo'] }}/git/refs/heads/{{ $('Set Github Info').first().json['Github Branch'] }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"sha\": \"{{ $json.sha }}\",\n  \"force\": false\n}",
+        "options": {}
+      },
+      "id": "18aae200-aea0-4b48-b13a-3111256959dd",
+      "name": "Update branch",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        340,
+        -1080
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "XYM8LiYCuqzj8z5S",
+          "name": "Github Header"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "64d1ec90-72bc-46e8-9cec-db134f2d65b4",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -320,
+        -1320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3e65c520-9fcd-442a-adf3-2a0f273b149b",
+              "name": "Github Repo",
+              "type": "string",
+              "value": "test-git-n8n-muti-files"
+            },
+            {
+              "id": "49bf7a21-6fc2-4c8c-a229-1b2f41a4de71",
+              "name": "Github Username",
+              "type": "string",
+              "value": "nae-simplescalablesolutions"
+            },
+            {
+              "id": "c8cf6bad-5c28-4536-ac16-1442a4fdbd18",
+              "name": "Github Branch",
+              "type": "string",
+              "value": "main"
+            },
+            {
+              "id": "3fea08bc-032e-4194-9fd6-9e4de79e2fcf",
+              "name": "Github Commit Update Message",
+              "type": "string",
+              "value": "Update Line Github Workflow"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b4f9a55d-e896-478a-a303-84ec83e3cab5",
+      "name": "Set Github Info",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -100,
+        -1320
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## Push Multiple Files to GitHub Repo  \nA streamlined workflow for uploading multiple files to a GitHub repository via the GitHub REST API. This solution addresses a significant limitation of the native GitHub n8n node, which supports only single-file uploads.\n\nThis approach enables batch file operations, making it particularly valuable for automation scenarios that require simultaneous uploads of multiple files to your GitHub repositories.\n\n### Setup Instructions:\n1. Create a new GitHub Personal Access Token [here](https://github.com/settings/personal-access-tokens). In the \"Repository access\" section, select your repository and grant \"Read and write\" permissions under the \"Contents\" category.  \n2. Configure your GitHub information in the \"Set GitHub Info\" node.  \n3. Update the \"Create New Tree\" node with your filenames and content. You can add as many tree entries (files) as needed.",
+        "height": 380,
+        "width": 580
+      },
+      "id": "29db961a-ca22-4032-85de-fa0c6d6f0822",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -980,
+        -1340
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "filters": {
+          "tags": "Line"
+        },
+        "requestOptions": {}
+      },
+      "id": "86059903-8fd7-451d-a0c9-534d4f7cf7d3",
+      "name": "Retrieve workflows [N8N]",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -1320
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "NSNGMqAkVBFqYh0X",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const workflows = $('Retrieve workflows [N8N]').all();\nconst newTree = {\n  base_tree: $('Get base tree SHA').first().json[\"tree\"][\"sha\"],\n  tree: []\n}\nfor (const workflow of workflows) {\n  const item = workflow.json\n  const treeItem = {\n    path: `public/${item.name.replace(/\\s+/g, '-').toLowerCase()}-${item.id}.json`,\n    mode: \"100644\",\n    type: \"blob\",\n    content: JSON.stringify(item, null, 2)\n  };\n  newTree.tree.push(treeItem);\n}\n\nreturn newTree"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -1080
+      ],
+      "id": "7ed79e22-91b8-45f1-828e-8c6989d45028",
+      "name": "Code"
+    }
+  ],
+  "connections": {
+    "Get latest commit SHA": {
+      "main": [
+        [
+          {
+            "node": "Get base tree SHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get base tree SHA": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create new tree": {
+      "main": [
+        [
+          {
+            "node": "Create commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create commit": {
+      "main": [
+        [
+          {
+            "node": "Update branch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Github Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Github Info": {
+      "main": [
+        [
+          {
+            "node": "Retrieve workflows [N8N]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve workflows [N8N]": {
+      "main": [
+        [
+          {
+            "node": "Get latest commit SHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Create new tree",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e7da0a01-f9cc-4dd9-b72a-6aec5ed9918a",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-02T12:05:27.901Z",
+      "updatedAt": "2025-04-02T12:05:27.901Z",
+      "id": "XCMgNVG3Bb8NnshP",
+      "name": "Line"
+    }
+  ]
+}
