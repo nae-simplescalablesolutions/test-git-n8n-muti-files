@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-13T05:13:43.465Z",
-  "updatedAt": "2025-04-09T06:11:25.968Z",
+  "updatedAt": "2025-04-09T06:14:05.638Z",
   "id": "YiEQR4M7JfHUbF2f",
   "name": "Line to GHL",
   "active": true,
@@ -1643,55 +1643,6 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {
-    "Webhook from Line": [
-      {
-        "json": {
-          "headers": {
-            "host": "n8n-scalify-u18380.vm.elestio.app",
-            "x-real-ip": "147.92.149.169",
-            "x-forwarded-for": "147.92.149.169",
-            "x-forwarded-proto": "https",
-            "x-forwarded-port": "443",
-            "connection": "close",
-            "content-length": "560",
-            "x-line-signature": "CjmcIxhv7KZFxYgYgt2d6IeQfbOsSjgqxBsPYAHJZG4=",
-            "content-type": "application/json; charset=utf-8",
-            "user-agent": "LineBotWebhook/2.0"
-          },
-          "params": {
-            "locationId": "BdbyH4PWaqOMU5FUcrZa"
-          },
-          "query": {},
-          "body": {
-            "destination": "Uc8088b48180c74f909d55e446ea57770",
-            "events": [
-              {
-                "type": "message",
-                "message": {
-                  "type": "text",
-                  "id": "553739836691841595",
-                  "quoteToken": "e7-56H2N0VtbZxC-_IjH8mR_P-aZyTnqYtiX3FsMcjPtsmNcCU-847CWsYlLlzmoiscv4ekyiKPAx3wnug7y0Uin7ZRnYWCWTiWimzmpxDWWPGxj8PxWga83EusvMGN_qQ2SrLZ3ZyB5br3TaRBnbw",
-                  "text": "test"
-                },
-                "webhookEventId": "01JQ61JNED4NPXJ7DNVP7D2Z48",
-                "deliveryContext": {
-                  "isRedelivery": false
-                },
-                "timestamp": 1742885966802,
-                "source": {
-                  "type": "user",
-                  "userId": "Uc68552d1f9e4203a6b6bf31a891bec41"
-                },
-                "replyToken": "ace9bba7428f427eb4b0941ca90d8dfe",
-                "mode": "active"
-              }
-            ]
-          },
-          "webhookUrl": "https://n8n-scalify-u18380.vm.elestio.app/webhook/638c118e-1c98-4491-b6ff-14e2e75380b6/:locationId",
-          "executionMode": "production"
-        }
-      }
-    ],
     "Code": [
       {
         "json": {
@@ -1783,7 +1734,7 @@
       }
     ]
   },
-  "versionId": "af3fa6c4-652a-4d28-bfe8-b26124f97d31",
+  "versionId": "4af764a9-c7c6-4305-9a75-781ea382f757",
   "triggerCount": 2,
   "tags": []
 }
